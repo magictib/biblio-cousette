@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node --check index.html)",
+      "PowerShell(node --check \"c:\\\\Users\\\\thiba\\\\Desktop\\\\VS CODE\\\\index.html\" 2>&1)",
+      "Bash(gh repo *)",
+      "PowerShell(gh repo list magictib --limit 20)",
+      "Bash(git commit -m ' *)",
+      "Bash(git remote *)",
+      "Bash(git push *)"
+    ]
+  }
+}
