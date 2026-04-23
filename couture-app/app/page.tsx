@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { initializeApp, getApps } from "firebase/app";
 import { getFirestore, collection, addDoc, onSnapshot, query, updateDoc, doc, orderBy } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { Scissors, Box, Camera, Users, Plus, CheckCircle2, Ruler, X, Leaf, Loader2, Palette } from 'lucide-react';
+import { Scissors, Box, Camera, Users, Plus, CheckCircle2, Ruler, X, Loader2, Palette } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const firebaseConfig = {
@@ -84,23 +84,24 @@ export default function CoutureApp() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-black font-sans relative overflow-x-hidden">
+    <div className="min-h-screen bg-white text-black font-sans relative">
       
-      {/* IMAGE DE FOND - Test avec opacité plus forte (40%) */}
+      {/* IMAGE DE FOND - Forcée avec !important style */}
       <div 
-        className="fixed inset-0 z-0 opacity-40 pointer-events-none"
+        className="fixed inset-0 z-0 opacity-30 pointer-events-none"
         style={{
           backgroundImage: "url('/fond-couture.jpg')",
           backgroundSize: 'cover',
           backgroundPosition: 'center',
+          backgroundAttachment: 'fixed'
         }}
       ></div>
 
       <div className="relative z-10 pb-24">
-        <header className="bg-white/90 p-6 sticky top-0 z-20 flex justify-between items-center border-b shadow-sm">
+        <header className="bg-white p-6 sticky top-0 z-20 flex justify-between items-center border-b">
           <div className="flex items-center gap-2">
             <div className="bg-emerald-700 p-1 rounded text-white"><Scissors size={20} /></div>
-            <h1 className="text-xl font-black text-emerald-900 uppercase tracking-tighter">Biblio Cousette</h1>
+            <h1 className="text-xl font-black text-emerald-900 uppercase italic">Biblio Cousette</h1>
           </div>
           <button onClick={() => setShowModal(true)} className="bg-emerald-600 text-white p-2 rounded-full shadow-lg"><Plus size={24} /></button>
         </header>
@@ -109,13 +110,13 @@ export default function CoutureApp() {
           {view === 'inventory' && (
             <div className="grid grid-cols-2 gap-4">
               {fabrics.map(fabric => (
-                <div key={fabric.id} className="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-md">
+                <div key={fabric.id} className="bg-white rounded-2xl border overflow-hidden shadow-lg">
                   <div className="h-40 bg-stone-100 relative">
-                    {fabric.image ? <img src={fabric.image} className="h-full w-full object-cover" /> : <div className="h-full flex items-center justify-center text-stone-300 uppercase text-[10px]">No Photo</div>}
-                    <div className="absolute top-2 right-2 bg-black text-white text-[8px] px-2 py-1 rounded-full font-bold uppercase">{fabric.color}</div>
+                    {fabric.image ? <img src={fabric.image} className="h-full w-full object-cover" /> : <div className="h-full flex items-center justify-center text-stone-300 text-[10px]">PHOTO</div>}
+                    <div className="absolute top-2 right-2 bg-black text-white text-[8px] px-2 py-1 rounded-full font-bold">{fabric.color}</div>
                   </div>
-                  <div className="p-3 bg-white">
-                    <h3 className="font-bold text-xs uppercase text-black truncate">{fabric.name}</h3>
+                  <div className="p-3">
+                    <h3 className="font-bold text-[10px] uppercase text-black truncate">{fabric.name}</h3>
                     <p className="text-[10px] text-emerald-700 font-bold tracking-widest">{fabric.length}m x {fabric.width}cm</p>
                   </div>
                 </div>
@@ -131,7 +132,7 @@ export default function CoutureApp() {
                   <div className="w-full bg-stone-200 h-2 rounded-full mb-4 overflow-hidden">
                     <div className="bg-emerald-500 h-full transition-all" style={{width: `${project.progress}%`}}></div>
                   </div>
-                  <button onClick={() => updateProjectStep(project.id, project.currentStep)} className="w-full py-3 bg-black text-white rounded-xl font-bold text-xs uppercase">Étape Suivante</button>
+                  <button onClick={() => updateProjectStep(project.id, project.currentStep)} className="w-full py-3 bg-black text-white rounded-xl font-bold text-xs uppercase italic">Étape Suivante</button>
                 </div>
               ))}
             </div>
@@ -141,25 +142,30 @@ export default function CoutureApp() {
         <nav className="fixed bottom-6 left-4 right-4 bg-white border h-20 rounded-full shadow-2xl flex justify-around items-center px-4 z-40">
           <button onClick={() => setView('inventory')} className={view === 'inventory' ? 'text-emerald-700' : 'text-stone-400'}><Box size={24} /></button>
           <button onClick={() => setView('projects')} className={view === 'projects' ? 'text-emerald-700' : 'text-stone-400'}><Scissors size={24} /></button>
-          <button onClick={() => setView('scan')} className="bg-emerald-600 text-white p-4 rounded-full -mt-10 shadow-xl"><Camera size={28} /></button>
+          <button onClick={() => setView('scan')} className="bg-emerald-600 text-white p-4 rounded-full -mt-10 shadow-xl border-4 border-white"><Camera size={28} /></button>
           <button onClick={() => setView('community')} className={view === 'community' ? 'text-emerald-700' : 'text-stone-400'}><Users size={24} /></button>
           <button onClick={() => setView('patterns')} className={view === 'patterns' ? 'text-emerald-700' : 'text-stone-400'}><Ruler size={24} /></button>
         </nav>
 
         <AnimatePresence>
           {showModal && (
-            <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-              <motion.div initial={{scale:0.9, opacity:0}} animate={{scale:1, opacity:1}} className="bg-white w-full max-w-md rounded-[2rem] p-8 shadow-2xl relative">
+            <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+              <motion.div initial={{scale:0.9, opacity:0}} animate={{scale:1, opacity:1}} className="bg-white w-full max-w-md rounded-[2rem] p-8 shadow-2xl">
                 <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-xl font-black text-black uppercase">Ajouter</h2>
-                  <button onClick={() => setShowModal(false)} className="text-stone-400"><X /></button>
+                  <h2 className="text-xl font-black text-black uppercase tracking-widest">Ajouter</h2>
+                  <button onClick={() => setShowModal(false)} className="text-stone-400 p-2"><X /></button>
                 </div>
                 
                 <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="flex bg-stone-100 p-1 rounded-2xl mb-4 shadow-inner">
+                     <button type="button" onClick={() => setFormData({...formData, type: 'fabric'})} className={`flex-1 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${formData.type === 'fabric' ? 'bg-white shadow-md text-emerald-700' : 'text-stone-400'}`}>Tissu</button>
+                     <button type="button" onClick={() => setFormData({...formData, type: 'project'})} className={`flex-1 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${formData.type === 'project' ? 'bg-white shadow-md text-emerald-700' : 'text-stone-400'}`}>Projet</button>
+                  </div>
+
                   <input 
                     required 
                     style={{ color: 'black', backgroundColor: 'white' }}
-                    className="w-full p-4 border border-stone-300 rounded-2xl outline-none text-sm font-bold uppercase tracking-widest" 
+                    className="w-full p-4 border-2 border-stone-100 rounded-2xl outline-none text-sm font-bold text-black placeholder:text-stone-300" 
                     placeholder="NOM DE L'ÉLÉMENT" 
                     value={formData.name} 
                     onChange={e => setFormData({...formData, name: e.target.value})} 
@@ -169,22 +175,22 @@ export default function CoutureApp() {
                     <>
                       <input 
                         style={{ color: 'black', backgroundColor: 'white' }}
-                        className="w-full p-4 border border-stone-300 rounded-2xl outline-none text-sm font-bold uppercase tracking-widest" 
-                        placeholder="COULEUR (EX: ROUGE)" 
+                        className="w-full p-4 border-2 border-stone-100 rounded-2xl outline-none text-sm font-bold text-black placeholder:text-stone-300" 
+                        placeholder="COULEUR (EX: MOUTARDE)" 
                         value={formData.color} 
                         onChange={e => setFormData({...formData, color: e.target.value})} 
                       />
                       <div className="flex gap-2">
-                        <input style={{ color: 'black', backgroundColor: 'white' }} className="w-1/2 p-4 border border-stone-300 rounded-2xl outline-none text-sm font-bold uppercase tracking-widest" placeholder="LONG. (M)" value={formData.length} onChange={e => setFormData({...formData, length: e.target.value})} />
-                        <input style={{ color: 'black', backgroundColor: 'white' }} className="w-1/2 p-4 border border-stone-300 rounded-2xl outline-none text-sm font-bold uppercase tracking-widest" placeholder="LAIZE (CM)" value={formData.width} onChange={e => setFormData({...formData, width: e.target.value})} />
+                        <input style={{ color: 'black', backgroundColor: 'white' }} className="w-1/2 p-4 border-2 border-stone-100 rounded-2xl outline-none text-sm font-bold text-black" placeholder="LONG. (M)" value={formData.length} onChange={e => setFormData({...formData, length: e.target.value})} />
+                        <input style={{ color: 'black', backgroundColor: 'white' }} className="w-1/2 p-4 border-2 border-stone-100 rounded-2xl outline-none text-sm font-bold text-black" placeholder="LAIZE (CM)" value={formData.width} onChange={e => setFormData({...formData, width: e.target.value})} />
                       </div>
-                      <div className="relative h-24 bg-stone-100 rounded-2xl border-2 border-dashed flex flex-col items-center justify-center overflow-hidden">
-                        {uploading ? <Loader2 className="animate-spin" /> : formData.imageUrl ? <img src={formData.imageUrl} className="h-full w-full object-cover" /> : <span className="text-[10px] font-bold text-stone-400">AJOUTER PHOTO</span>}
-                        <input type="file" accept="image/*" capture="environment" onChange={handleImageUpload} className="absolute inset-0 opacity-0" />
+                      <div className="relative h-24 bg-stone-50 rounded-2xl border-2 border-dashed flex flex-col items-center justify-center overflow-hidden border-stone-200">
+                        {uploading ? <Loader2 className="animate-spin text-emerald-600" /> : formData.imageUrl ? <img src={formData.imageUrl} className="h-full w-full object-cover" /> : <div className="text-center text-stone-300 font-bold text-[10px] uppercase tracking-tighter"><Camera className="mx-auto mb-1" size={20} />AJOUTER PHOTO</div>}
+                        <input type="file" accept="image/*" capture="environment" onChange={handleImageUpload} className="absolute inset-0 opacity-0 cursor-pointer" />
                       </div>
                     </>
                   )}
-                  <button type="submit" className="w-full py-4 bg-emerald-600 text-white rounded-2xl font-black uppercase shadow-lg">Enregistrer</button>
+                  <button type="submit" className="w-full py-5 bg-emerald-700 text-white rounded-[2rem] font-black uppercase tracking-widest text-xs shadow-lg active:scale-95 transition">Enregistrer</button>
                 </form>
               </motion.div>
             </div>
