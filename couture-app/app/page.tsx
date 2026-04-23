@@ -2,7 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { initializeApp, getApps } from "firebase/app";
 import { getFirestore, collection, addDoc, onSnapshot, query, updateDoc, doc, orderBy } from "firebase/firestore";
-import { Scissors, Box, Camera, Users, Plus, CheckCircle2, Ruler, X, Leaf } from 'lucide-react';
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { Scissors, Box, Camera, Users, Plus, CheckCircle2, Ruler, X, Leaf, Upload, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // --- CONFIGURATION FIREBASE ---
@@ -18,13 +19,15 @@ const firebaseConfig = {
 
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 const db = getFirestore(app);
+const storage = getStorage(app);
 
 export default function CoutureApp() {
   const [view, setView] = useState('inventory');
   const [fabrics, setFabrics] = useState<any[]>([]);
   const [projects, setProjects] = useState<any[]>([]);
   const [showModal, setShowModal] = useState(false);
-  const [formData, setFormData] = useState({ name: '', length: '', width: '', type: 'fabric' });
+  const [uploading, setUploading] = useState(false);
+  const [formData, setFormData] = useState({ name: '', length: '', width: '', type: 'fabric', imageUrl: '' });
 
   const steps = ["Achat", "Lavage", "Découpe", "Broderie", "Assemblage", "Couture", "Finitions"];
 
@@ -38,15 +41,33 @@ export default function CoutureApp() {
     } catch (e) { console.error("Erreur Firebase:", e); }
   }, []);
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const storageRef = ref(storage, `fabrics/${Date.now()}_${file.name}`);
+      await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+      setFormData({ ...formData, imageUrl: url });
+    } catch (error) {
+      console.error("Erreur upload:", error);
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.name === '') return;
+    
     if (formData.type === 'fabric') {
       await addDoc(collection(db, "fabrics"), {
         name: formData.name,
         length: formData.length || "0",
         width: formData.width || "0",
-        image: "https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17?w=400"
+        image: formData.imageUrl || "https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17?w=400"
       });
     } else {
       await addDoc(collection(db, "projects"), {
@@ -57,7 +78,7 @@ export default function CoutureApp() {
       });
     }
     setShowModal(false);
-    setFormData({ name: '', length: '', width: '', type: 'fabric' });
+    setFormData({ name: '', length: '', width: '', type: 'fabric', imageUrl: '' });
   };
 
   const updateProjectStep = async (projectId: string, currentStepIndex: number) => {
@@ -87,7 +108,7 @@ export default function CoutureApp() {
           <div className="grid grid-cols-2 gap-4">
             {fabrics.map(fabric => (
               <div key={fabric.id} className="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-sm">
-                <div className="h-32 bg-stone-200 bg-cover bg-center" style={{backgroundImage: `url(${fabric.image})`}}></div>
+                <div className="h-40 bg-stone-200 bg-cover bg-center" style={{backgroundImage: `url(${fabric.image})`}}></div>
                 <div className="p-3">
                   <h3 className="font-bold text-sm truncate">{fabric.name}</h3>
                   <p className="text-xs text-stone-500 font-medium">{fabric.length}m x {fabric.width}cm</p>
@@ -117,23 +138,19 @@ export default function CoutureApp() {
                 </button>
               </div>
             ))}
-            {projects.length === 0 && <p className="text-center text-stone-400 mt-10 italic text-sm">Aucun projet en cours.</p>}
           </div>
         )}
 
         {view === 'scan' && (
           <div className="space-y-6 text-center">
-            <div className="relative aspect-[3/4] bg-stone-900 rounded-[2.5rem] overflow-hidden border-8 border-white shadow-2xl">
+             <div className="relative aspect-[3/4] bg-stone-900 rounded-[2.5rem] overflow-hidden border-8 border-white shadow-2xl">
+              <motion.div animate={{ y: [0, 400, 0] }} transition={{ repeat: Infinity, duration: 4, ease: "linear" }} className="h-1 w-full bg-emerald-400 shadow-[0_0_20px_emerald] z-10 opacity-50" />
               <div className="absolute inset-0 flex flex-col items-center justify-center text-stone-500">
                 <Camera size={48} className="mb-4 opacity-20" />
-                <p className="text-xs uppercase tracking-widest">Analyse IA...</p>
+                <p className="text-xs uppercase tracking-widest">Scanner de surface IA</p>
               </div>
-              <motion.div animate={{ y: [0, 400, 0] }} transition={{ repeat: Infinity, duration: 4, ease: "linear" }} className="h-1 w-full bg-emerald-400 shadow-[0_0_20px_emerald] z-10 opacity-50" />
             </div>
-            <div className="bg-emerald-50 border border-emerald-100 p-6 rounded-3xl">
-              <h2 className="font-bold text-emerald-900 mb-2 italic">Analyse de surface</h2>
-              <p className="text-sm text-emerald-700">L'IA calcule si votre patron rentre dans ce coupon.</p>
-            </div>
+            <p className="text-sm text-stone-500 px-8 italic">Bientôt : L'IA calculera automatiquement la surface de votre coupon à partir d'une photo.</p>
           </div>
         )}
       </main>
@@ -149,9 +166,9 @@ export default function CoutureApp() {
       <AnimatePresence>
         {showModal && (
           <div className="fixed inset-0 bg-stone-900/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4">
-            <motion.div initial={{y:100}} animate={{y:0}} exit={{y:100}} className="bg-white w-full max-w-md rounded-[2.5rem] p-8 shadow-2xl overflow-hidden relative">
+            <motion.div initial={{y:100}} animate={{y:0}} exit={{y:100}} className="bg-white w-full max-w-md rounded-[2.5rem] p-8 shadow-2xl relative">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold">Ajouter un élément</h2>
+                <h2 className="text-xl font-bold uppercase tracking-tight">Ajouter</h2>
                 <button onClick={() => setShowModal(false)} className="p-2 bg-stone-100 rounded-full"><X size={20}/></button>
               </div>
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -159,14 +176,35 @@ export default function CoutureApp() {
                    <button type="button" onClick={() => setFormData({...formData, type: 'fabric'})} className={`flex-1 py-2 rounded-xl text-xs font-bold uppercase ${formData.type === 'fabric' ? 'bg-white shadow-sm text-emerald-600' : 'text-stone-500'}`}>Tissu</button>
                    <button type="button" onClick={() => setFormData({...formData, type: 'project'})} className={`flex-1 py-2 rounded-xl text-xs font-bold uppercase ${formData.type === 'project' ? 'bg-white shadow-sm text-emerald-600' : 'text-stone-500'}`}>Projet</button>
                 </div>
-                <input required placeholder="Nom (ex: Coton fleuri...)" className="w-full p-4 bg-stone-100 rounded-2xl outline-none focus:ring-2 ring-emerald-500 transition-all text-sm" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+
+                {formData.type === 'fabric' && (
+                  <div className="relative h-32 w-full bg-stone-100 rounded-2xl border-2 border-dashed border-stone-300 flex flex-col items-center justify-center overflow-hidden">
+                    {uploading ? (
+                      <Loader2 className="animate-spin text-emerald-600" />
+                    ) : formData.imageUrl ? (
+                      <img src={formData.imageUrl} className="h-full w-full object-cover" />
+                    ) : (
+                      <>
+                        <Camera className="text-stone-400 mb-2" />
+                        <span className="text-[10px] uppercase font-bold text-stone-400 text-center px-4 leading-tight">Prendre en photo / Choisir un fichier</span>
+                      </>
+                    )}
+                    <input type="file" accept="image/*" capture="environment" onChange={handleImageUpload} className="absolute inset-0 opacity-0 cursor-pointer" />
+                  </div>
+                )}
+
+                <input required placeholder="Nom (ex: Coton fleuri...)" className="w-full p-4 bg-stone-100 rounded-2xl outline-none text-sm" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+                
                 {formData.type === 'fabric' && (
                   <div className="flex gap-4">
                     <input placeholder="Long. (m)" className="w-1/2 p-4 bg-stone-100 rounded-2xl outline-none text-sm" value={formData.length} onChange={e => setFormData({...formData, length: e.target.value})} />
                     <input placeholder="Laize (cm)" className="w-1/2 p-4 bg-stone-100 rounded-2xl outline-none text-sm" value={formData.width} onChange={e => setFormData({...formData, width: e.target.value})} />
                   </div>
                 )}
-                <button type="submit" className="w-full py-4 bg-emerald-600 text-white rounded-2xl font-bold mt-4 shadow-lg active:scale-95 transition tracking-widest text-xs uppercase">Enregistrer</button>
+                
+                <button type="submit" disabled={uploading} className="w-full py-4 bg-emerald-600 text-white rounded-2xl font-bold mt-4 shadow-lg active:scale-95 transition tracking-widest text-xs uppercase disabled:bg-stone-300">
+                  {uploading ? "Envoi en cours..." : "Enregistrer"}
+                </button>
               </form>
             </motion.div>
           </div>
