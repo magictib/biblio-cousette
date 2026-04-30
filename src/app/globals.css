@@ -1,26 +1,211 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --linen:        #FAF4E8;
+  --creme:        #FDFAF2;
+  --mauve:        #7A4F5C;
+  --mauve-light:  #C4889A;
+  --mauve-pale:   #EDD9E0;
+  --sage:         #5A7A4F;
+  --sage-light:   #A0C090;
+  --gold:         #B8872A;
+  --brun:         #3D2418;
+  --brun-mid:     #7A5A4E;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background: var(--linen);
+  --color-foreground: var(--brun);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+body {
+  background-color: var(--linen);
+  color: var(--brun);
+  font-family: Georgia, 'Times New Roman', serif;
+  /* Texture : papier patron de couture (grille légère) */
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent, transparent 31px,
+      rgba(196, 136, 154, 0.07) 31px, rgba(196, 136, 154, 0.07) 32px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent, transparent 31px,
+      rgba(196, 136, 154, 0.07) 31px, rgba(196, 136, 154, 0.07) 32px
+    );
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ─── Grande carte avec surpiqûre ───────────────────────────── */
+.card-stitched {
+  background-color: var(--creme);
+  border: 2px solid var(--mauve-light);
+  border-radius: 10px;
+  position: relative;
+  box-shadow: 0 3px 14px rgba(122, 79, 92, 0.13);
+}
+
+.card-stitched::before {
+  content: '';
+  position: absolute;
+  inset: 7px;
+  border: 1.5px dashed var(--mauve-light);
+  border-radius: 5px;
+  pointer-events: none;
+  opacity: 0.38;
+}
+
+/* ─── Carte d'item individuel (tissu, patron, projet) ─────────── */
+.item-card {
+  background-color: white;
+  border: 1.5px solid var(--mauve-pale);
+  border-radius: 8px;
+  position: relative;
+  transition: box-shadow 0.2s, border-color 0.2s;
+  overflow: hidden;
+}
+
+.item-card:hover {
+  box-shadow: 0 4px 16px rgba(122, 79, 92, 0.15);
+  border-color: var(--mauve-light);
+}
+
+/* Surpiqûre interne au hover */
+.item-card::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border: 1px dashed var(--mauve-pale);
+  border-radius: 4px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 0;
+}
+
+.item-card:hover::before {
+  opacity: 0.7;
+  border-color: var(--mauve-light);
+}
+
+/* ─── Onglets style étiquette coupée dans du tissu ────────────── */
+.swatch-tab {
+  padding: 7px 18px;
+  border-radius: 6px 6px 0 0;
+  border: 1.5px solid var(--mauve-light);
+  border-bottom: none;
+  background-color: var(--creme);
+  color: var(--brun-mid);
+  font-family: Georgia, serif;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+  position: relative;
+  top: 2px;
+}
+
+.swatch-tab.active {
+  background-color: var(--mauve);
+  color: var(--creme);
+  border-color: var(--mauve);
+  font-weight: bold;
+}
+
+.swatch-tab:not(.active):hover {
+  background-color: var(--mauve-pale);
+  color: var(--mauve);
+}
+
+/* ─── Bouton primaire couture ─────────────────────────────────── */
+.btn-couture {
+  background-color: var(--mauve);
+  color: var(--creme);
+  border: none;
+  border-radius: 6px;
+  padding: 8px 18px;
+  font-family: Georgia, serif;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-couture:hover {
+  background-color: var(--brun);
+}
+
+.btn-couture:active {
+  transform: scale(0.97);
+}
+
+/* ─── Bouton sage (actions secondaires / nouveau) ─────────────── */
+.btn-sage {
+  background-color: var(--sage);
+  color: var(--creme);
+  border: none;
+  border-radius: 6px;
+  padding: 8px 18px;
+  font-family: Georgia, serif;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-sage:hover {
+  background-color: #3d5c35;
+}
+
+/* ─── Bouton danger doux ─────────────────────────────────────── */
+.btn-danger {
+  background-color: rgba(196, 136, 154, 0.12);
+  color: var(--mauve);
+  border: 1px solid var(--mauve-pale);
+  border-radius: 6px;
+  padding: 7px 14px;
+  font-family: Georgia, serif;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  width: 100%;
+}
+
+.btn-danger:hover {
+  background-color: rgba(196, 136, 154, 0.25);
+  border-color: var(--mauve-light);
+}
+
+/* ─── Formulaires ─────────────────────────────────────────────── */
+.field-label {
+  display: block;
+  font-family: Georgia, serif;
+  font-size: 0.82rem;
+  color: var(--brun-mid);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.field-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1.5px solid var(--mauve-pale);
+  border-radius: 6px;
+  background-color: white;
+  color: var(--brun);
+  font-family: Georgia, serif;
+  font-size: 0.9rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+
+.field-input:focus {
+  border-color: var(--mauve-light);
+  box-shadow: 0 0 0 3px rgba(196, 136, 154, 0.15);
 }

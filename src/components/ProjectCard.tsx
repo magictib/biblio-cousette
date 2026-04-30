@@ -11,85 +11,66 @@ interface ProjectCardProps {
   onDelete: (id: string) => void;
 }
 
-export default function ProjectCard({
-  project,
-  fabricName,
-  patternName,
-  onUpdate,
-  onDelete,
-}: ProjectCardProps) {
+const statusConfig: Record<string, { label: string; icon: string; bg: string; color: string; border: string }> = {
+  planning:  { label: 'Planning',  icon: '📋', bg: '#EBF1FA', color: '#3B5EA6', border: '#A8BEE0' },
+  brodage:   { label: 'Brodage',   icon: '🧵', bg: '#FAF3E0', color: '#8A6A10', border: '#D4B86A' },
+  decoupe:   { label: 'Découpe',   icon: '✂️', bg: '#FBF0E8', color: '#944E1E', border: '#D49070' },
+  couture:   { label: 'Couture',   icon: '🪡', bg: 'var(--mauve-pale)', color: 'var(--mauve)', border: 'var(--mauve-light)' },
+  finition:  { label: 'Finition',  icon: '✨', bg: '#FAE8F0', color: '#944060', border: '#D4809C' },
+  complete:  { label: 'Complète',  icon: '✅', bg: '#E8F5EC', color: '#2E7A46', border: '#80C894' },
+};
+
+export default function ProjectCard({ project, fabricName, patternName, onUpdate, onDelete }: ProjectCardProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [newStatus, setNewStatus] = useState(project.status);
-
-  const statusIcons = {
-    planning: '📋',
-    brodage: '🧵',
-    decoupe: '✂️',
-    couture: '🪡',
-    finition: '✨',
-    complete: '✅',
-  };
-
-  const statusLabels = {
-    planning: 'Planning',
-    brodage: 'Brodage',
-    decoupe: 'Découpe',
-    couture: 'Couture',
-    finition: 'Finition',
-    complete: 'Complète',
-  };
-
-  const statusColors = {
-    planning: 'bg-blue-100 text-blue-800 border-blue-300',
-    brodage: 'bg-yellow-100 text-yellow-800 border-yellow-300',
-    decoupe: 'bg-orange-100 text-orange-800 border-orange-300',
-    couture: 'bg-purple-100 text-purple-800 border-purple-300',
-    finition: 'bg-pink-100 text-pink-800 border-pink-300',
-    complete: 'bg-green-100 text-green-800 border-green-300',
-  };
+  const cfg = statusConfig[project.status] ?? statusConfig.planning;
 
   const handleStatusChange = () => {
-    onUpdate(project.id, { status: newStatus });
+    onUpdate(project.id, { status: newStatus as Project['status'] });
     setIsEditing(false);
   };
 
   const handleAddPhoto = () => {
-    const url = prompt('Entrez l\'URL de la photo:');
-    if (url) {
-      onUpdate(project.id, {
-        photos: [...project.photos, url],
-      });
-    }
+    const url = prompt('URL de la photo :');
+    if (url) onUpdate(project.id, { photos: [...project.photos, url] });
   };
 
-  const handleRemovePhoto = (index: number) => {
-    onUpdate(project.id, {
-      photos: project.photos.filter((_, i) => i !== index),
-    });
-  };
+  const handleRemovePhoto = (index: number) =>
+    onUpdate(project.id, { photos: project.photos.filter((_, i) => i !== index) });
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
-      {/* Gallery */}
-      <div className="relative bg-gray-100 h-48 overflow-hidden">
+    /* item-card sans overflow:hidden pour que la surpiqûre ::before soit visible */
+    <div className="item-card" style={{ overflow: 'visible' }}>
+
+      {/* ── Galerie photo ──────────────────────────────────────────── */}
+      <div style={{
+        position: 'relative',
+        backgroundColor: 'var(--linen)',
+        height: '180px',
+        overflow: 'hidden',
+        borderRadius: '7px 7px 0 0',
+        borderBottom: '1px solid var(--mauve-pale)',
+      }}>
         {project.photos.length > 0 ? (
-          <div className="flex">
+          <div style={{ display: 'flex', height: '100%' }}>
             {project.photos.map((photo, idx) => (
-              <div
-                key={idx}
-                className="relative flex-1 bg-gray-200 group"
-              >
+              <div key={idx} style={{ flex: 1, position: 'relative' }} className="group">
                 <img
                   src={photo}
-                  alt={`${project.name} - Photo ${idx + 1}`}
-                  className="w-full h-48 object-cover"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = 'none';
-                  }}
+                  alt={`${project.name} — photo ${idx + 1}`}
+                  style={{ width: '100%', height: '180px', objectFit: 'cover' }}
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                 />
                 <button
                   onClick={() => handleRemovePhoto(idx)}
-                  className="absolute top-1 right-1 bg-red-600 text-white px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                  style={{
+                    position: 'absolute', top: '6px', right: '6px',
+                    background: 'rgba(122,79,92,.85)', color: 'white',
+                    border: 'none', borderRadius: '4px',
+                    padding: '2px 7px', fontSize: '0.75rem',
+                    cursor: 'pointer', opacity: 0,
+                  }}
+                  className="group-hover:opacity-100 transition-opacity"
                 >
                   ✕
                 </button>
@@ -97,101 +78,127 @@ export default function ProjectCard({
             ))}
           </div>
         ) : (
-          <div className="flex items-center justify-center h-48 text-gray-400">
-            <p>Pas de photo</p>
+          <div style={{
+            display: 'flex', flexDirection: 'column',
+            alignItems: 'center', justifyContent: 'center',
+            height: '100%', color: 'var(--brun-mid)',
+            fontSize: '0.85rem', fontStyle: 'italic',
+          }}>
+            <span style={{ fontSize: '1.8rem', marginBottom: '6px' }}>📷</span>
+            Pas encore de photo
           </div>
         )}
+
+        {/* Bouton ajouter photo */}
         <button
           onClick={handleAddPhoto}
-          className="absolute bottom-2 right-2 bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
+          style={{
+            position: 'absolute', bottom: '8px', right: '8px',
+            backgroundColor: 'var(--mauve)', color: 'var(--creme)',
+            border: 'none', borderRadius: '5px',
+            padding: '4px 10px', fontSize: '0.78rem',
+            cursor: 'pointer', fontFamily: 'Georgia, serif',
+          }}
         >
-          📷 Ajouter
+          + Photo
         </button>
       </div>
 
-      {/* Content */}
-      <div className="p-4">
-        <h4 className="font-bold text-lg text-gray-900 mb-2">{project.name}</h4>
+      {/* ── Contenu ────────────────────────────────────────────────── */}
+      <div style={{ padding: '16px' }}>
 
-        {/* Status */}
-        <div className="mb-3">
+        {/* Titre */}
+        <h4 style={{
+          fontFamily: 'Georgia, serif',
+          fontWeight: 'bold',
+          fontSize: '1rem',
+          color: 'var(--brun)',
+          margin: '0 0 12px',
+        }}>
+          {project.name}
+        </h4>
+
+        {/* Statut */}
+        <div style={{ marginBottom: '12px' }}>
           {isEditing ? (
-            <div className="flex gap-2 mb-2">
+            <div style={{ display: 'flex', gap: '6px' }}>
               <select
                 value={newStatus}
-                onChange={(e) => setNewStatus(e.target.value as any)}
-                className="flex-1 px-2 py-1 border border-gray-300 rounded text-sm"
+                onChange={(e) => setNewStatus(e.target.value as Project['status'])}
+                style={{
+                  flex: 1, padding: '6px 10px',
+                  border: '1.5px solid var(--mauve-light)',
+                  borderRadius: '6px', fontFamily: 'Georgia, serif',
+                  fontSize: '0.85rem', color: 'var(--brun)',
+                  backgroundColor: 'white',
+                }}
               >
-                <option value="planning">📋 Planning</option>
-                <option value="brodage">🧵 Brodage</option>
-                <option value="decoupe">✂️ Découpe</option>
-                <option value="couture">🪡 Couture</option>
-                <option value="finition">✨ Finition</option>
-                <option value="complete">✅ Complète</option>
+                {Object.entries(statusConfig).map(([key, s]) => (
+                  <option key={key} value={key}>{s.icon} {s.label}</option>
+                ))}
               </select>
-              <button
-                onClick={handleStatusChange}
-                className="px-2 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700"
-              >
+              <button onClick={handleStatusChange}
+                style={{ padding: '6px 10px', backgroundColor: 'var(--sage)', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
                 ✓
               </button>
-              <button
-                onClick={() => {
-                  setIsEditing(false);
-                  setNewStatus(project.status);
-                }}
-                className="px-2 py-1 bg-gray-400 text-white rounded text-sm hover:bg-gray-500"
-              >
+              <button onClick={() => { setIsEditing(false); setNewStatus(project.status); }}
+                style={{ padding: '6px 10px', backgroundColor: 'var(--brun-mid)', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
                 ✕
               </button>
             </div>
           ) : (
             <button
               onClick={() => setIsEditing(true)}
-              className={`w-full px-3 py-2 rounded border-2 font-medium text-sm cursor-pointer hover:opacity-80 ${
-                statusColors[project.status]
-              }`}
+              style={{
+                width: '100%', padding: '7px 12px',
+                backgroundColor: cfg.bg, color: cfg.color,
+                border: `2px solid ${cfg.border}`, borderRadius: '6px',
+                fontFamily: 'Georgia, serif', fontSize: '0.88rem',
+                fontWeight: 'bold', cursor: 'pointer',
+                transition: 'opacity 0.15s',
+              }}
             >
-              {statusIcons[project.status]} {statusLabels[project.status]}
+              {cfg.icon} {cfg.label}
             </button>
           )}
         </div>
 
-        {/* Details */}
-        <div className="space-y-1 text-sm text-gray-600 mb-4">
-          <div className="flex justify-between">
-            <span>Tissu:</span>
-            <span className="font-medium text-gray-900">{fabricName}</span>
-          </div>
-          <div className="flex justify-between">
-            <span>Patron:</span>
-            <span className="font-medium text-gray-900">{patternName}</span>
-          </div>
-          <div className="flex justify-between">
-            <span>Créé:</span>
-            <span className="font-medium text-gray-900">
-              {new Date(project.createdAt).toLocaleDateString('fr-FR')}
-            </span>
-          </div>
+        {/* Détails tissu / patron / date */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '12px' }}>
+          {[
+            ['Tissu',  fabricName],
+            ['Patron', patternName],
+            ['Créé',   new Date(project.createdAt).toLocaleDateString('fr-FR')],
+          ].map(([label, value]) => (
+            <div key={label} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.83rem' }}>
+              <span style={{ color: 'var(--brun-mid)' }}>{label}</span>
+              <span style={{ color: 'var(--brun)', fontWeight: '600' }}>{value}</span>
+            </div>
+          ))}
         </div>
 
         {/* Notes */}
         {project.notes && (
-          <div className="bg-gray-50 p-2 rounded mb-4 text-xs text-gray-600">
+          <div style={{
+            backgroundColor: 'var(--linen)',
+            border: '1px solid var(--mauve-pale)',
+            borderRadius: '5px',
+            padding: '8px 10px',
+            fontSize: '0.78rem',
+            color: 'var(--brun-mid)',
+            fontStyle: 'italic',
+            marginBottom: '12px',
+          }}>
             {project.notes}
           </div>
         )}
 
-        {/* Delete button */}
+        {/* Supprimer */}
         <button
-          onClick={() => {
-            if (confirm('Êtes-vous sûr de vouloir supprimer ce projet?')) {
-              onDelete(project.id);
-            }
-          }}
-          className="w-full px-3 py-2 bg-red-50 text-red-600 rounded hover:bg-red-100 text-sm font-medium"
+          className="btn-danger"
+          onClick={() => { if (confirm('Supprimer ce projet ?')) onDelete(project.id); }}
         >
-          🗑️ Supprimer
+          🗑 Supprimer le projet
         </button>
       </div>
     </div>

@@ -8,115 +8,131 @@ import FabricList from './FabricList';
 import PatternList from './PatternList';
 
 export default function Inventory() {
-  const [fabrics, setFabrics] = useState<Fabric[]>([]);
-  const [patterns, setPatterns] = useState<Pattern[]>([]);
+  const [fabrics, setFabrics]     = useState<Fabric[]>([]);
+  const [patterns, setPatterns]   = useState<Pattern[]>([]);
   const [activeTab, setActiveTab] = useState<'fabrics' | 'patterns'>('fabrics');
-  const [showForm, setShowForm] = useState(false);
+  const [showForm, setShowForm]   = useState(false);
 
-  // Charger depuis localStorage
   useEffect(() => {
-    const savedFabrics = localStorage.getItem('fabrics');
-    const savedPatterns = localStorage.getItem('patterns');
-    if (savedFabrics) setFabrics(JSON.parse(savedFabrics));
-    if (savedPatterns) setPatterns(JSON.parse(savedPatterns));
+    const sf = localStorage.getItem('fabrics');
+    const sp = localStorage.getItem('patterns');
+    if (sf) setFabrics(JSON.parse(sf));
+    if (sp) setPatterns(JSON.parse(sp));
   }, []);
 
-  // Sauvegarder dans localStorage
-  useEffect(() => {
-    localStorage.setItem('fabrics', JSON.stringify(fabrics));
-  }, [fabrics]);
+  useEffect(() => { localStorage.setItem('fabrics',  JSON.stringify(fabrics));  }, [fabrics]);
+  useEffect(() => { localStorage.setItem('patterns', JSON.stringify(patterns)); }, [patterns]);
 
-  useEffect(() => {
-    localStorage.setItem('patterns', JSON.stringify(patterns));
-  }, [patterns]);
+  const addFabric = (fabric: Omit<Fabric, 'id'>) =>
+    setFabrics([...fabrics, { ...fabric, id: Date.now().toString() }]);
 
-  const addFabric = (fabric: Omit<Fabric, 'id'>) => {
-    const newFabric: Fabric = {
-      ...fabric,
-      id: Date.now().toString(),
-    };
-    setFabrics([...fabrics, newFabric]);
-  };
-
-  const deleteFabric = (id: string) => {
+  const deleteFabric = (id: string) =>
     setFabrics(fabrics.filter((f) => f.id !== id));
-  };
 
-  const addPattern = (pattern: Omit<Pattern, 'id'>) => {
-    const newPattern: Pattern = {
-      ...pattern,
-      id: Date.now().toString(),
-    };
-    setPatterns([...patterns, newPattern]);
-  };
+  const addPattern = (pattern: Omit<Pattern, 'id'>) =>
+    setPatterns([...patterns, { ...pattern, id: Date.now().toString() }]);
 
-  const deletePattern = (id: string) => {
+  const deletePattern = (id: string) =>
     setPatterns(patterns.filter((p) => p.id !== id));
-  };
 
   return (
-    <div className="p-6">
-      <div className="mb-6">
-        <h3 className="text-2xl font-bold text-gray-900 mb-4">📚 Inventaire</h3>
-        
-        <div className="flex gap-4 mb-6">
-          <button
-            onClick={() => setActiveTab('fabrics')}
-            className={`px-4 py-2 rounded-lg font-medium ${
-              activeTab === 'fabrics'
-                ? 'bg-purple-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
-            🧵 Tissu ({fabrics.length})
-          </button>
-          <button
-            onClick={() => setActiveTab('patterns')}
-            className={`px-4 py-2 rounded-lg font-medium ${
-              activeTab === 'patterns'
-                ? 'bg-purple-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
-            📋 Patron ({patterns.length})
-          </button>
-        </div>
+    <div style={{ padding: '28px 28px 32px' }}>
+
+      {/* Titre */}
+      <div style={{ marginBottom: '24px' }}>
+        <h3 style={{
+          color: 'var(--mauve)',
+          fontFamily: 'Georgia, serif',
+          fontSize: '1.4rem',
+          fontWeight: 'bold',
+          margin: 0,
+          marginBottom: '4px',
+        }}>
+          Inventaire
+        </h3>
+        <p style={{ color: 'var(--brun-mid)', fontSize: '0.85rem', margin: 0, fontStyle: 'italic' }}>
+          Gérez vos tissus et vos patrons
+        </p>
+      </div>
+
+      {/* ── Onglets style étiquettes découpées ─────────────────────── */}
+      <div style={{
+        borderBottom: '2px solid var(--mauve-light)',
+        marginBottom: '24px',
+        display: 'flex',
+        gap: '6px',
+        alignItems: 'flex-end',
+      }}>
+        <button
+          onClick={() => setActiveTab('fabrics')}
+          className={`swatch-tab${activeTab === 'fabrics' ? ' active' : ''}`}
+        >
+          🧵 Tissus
+          <span style={{
+            marginLeft: '6px',
+            fontSize: '0.75rem',
+            opacity: 0.7,
+          }}>
+            ({fabrics.length})
+          </span>
+        </button>
 
         <button
-          onClick={() => setShowForm(!showForm)}
-          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium"
+          onClick={() => setActiveTab('patterns')}
+          className={`swatch-tab${activeTab === 'patterns' ? ' active' : ''}`}
         >
-          {showForm ? '✖️ Annuler' : '➕ Ajouter'}
+          📋 Patrons
+          <span style={{
+            marginLeft: '6px',
+            fontSize: '0.75rem',
+            opacity: 0.7,
+          }}>
+            ({patterns.length})
+          </span>
         </button>
       </div>
 
+      {/* ── Bouton ajouter ────────────────────────────────────────── */}
+      <div style={{ marginBottom: '24px' }}>
+        <button
+          onClick={() => setShowForm(!showForm)}
+          className={showForm ? 'btn-couture' : 'btn-sage'}
+        >
+          {showForm ? '✖ Annuler' : '＋ Ajouter'}
+        </button>
+      </div>
+
+      {/* ── Formulaire ────────────────────────────────────────────── */}
       {showForm && (
-        <div className="bg-gray-50 p-6 rounded-lg mb-6">
+        <div style={{
+          backgroundColor: 'var(--linen)',
+          border: '1.5px solid var(--mauve-pale)',
+          borderRadius: '8px',
+          padding: '24px',
+          marginBottom: '24px',
+          position: 'relative',
+        }}>
+          {/* Surpiqûre interne du formulaire */}
+          <div style={{
+            position: 'absolute', inset: '5px',
+            border: '1px dashed var(--mauve-pale)',
+            borderRadius: '5px',
+            pointerEvents: 'none',
+            opacity: 0.5,
+          }}/>
           {activeTab === 'fabrics' ? (
-            <FabricForm
-              onSubmit={(fabric) => {
-                addFabric(fabric);
-                setShowForm(false);
-              }}
-            />
+            <FabricForm onSubmit={(f) => { addFabric(f); setShowForm(false); }} />
           ) : (
-            <PatternForm
-              onSubmit={(pattern) => {
-                addPattern(pattern);
-                setShowForm(false);
-              }}
-            />
+            <PatternForm onSubmit={(p) => { addPattern(p); setShowForm(false); }} />
           )}
         </div>
       )}
 
-      <div>
-        {activeTab === 'fabrics' ? (
-          <FabricList fabrics={fabrics} onDelete={deleteFabric} />
-        ) : (
-          <PatternList patterns={patterns} onDelete={deletePattern} />
-        )}
-      </div>
+      {/* ── Liste ─────────────────────────────────────────────────── */}
+      {activeTab === 'fabrics'
+        ? <FabricList  fabrics={fabrics}   onDelete={deleteFabric}  />
+        : <PatternList patterns={patterns} onDelete={deletePattern} />
+      }
     </div>
   );
 }
