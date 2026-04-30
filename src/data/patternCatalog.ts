@@ -12,7 +12,8 @@ export interface CatalogEntry {
 }
 
 const catalog: CatalogEntry[] = [
-  /* ── Deer & Doe ────────────────────────────────────────────── */
+
+  /* ── Deer & Doe ────────────────────────────────────────────────── */
   {
     id: 'dd-bleuet',
     name: 'Bleuet',
@@ -29,6 +30,7 @@ const catalog: CatalogEntry[] = [
       { size: '44', widthCm: 140, meters: 1.70 },
     ],
     piecesCount: 5,
+    url: 'https://www.deer-and-doe.fr',
   },
   {
     id: 'dd-plantain',
@@ -46,6 +48,7 @@ const catalog: CatalogEntry[] = [
       { size: '44', widthCm: 150, meters: 1.25 },
     ],
     piecesCount: 4,
+    url: 'https://www.deer-and-doe.fr',
   },
   {
     id: 'dd-chardon',
@@ -62,6 +65,7 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 150, meters: 1.60 },
     ],
     piecesCount: 4,
+    url: 'https://www.deer-and-doe.fr',
   },
   {
     id: 'dd-lilas',
@@ -78,6 +82,7 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 2.20 },
     ],
     piecesCount: 6,
+    url: 'https://www.deer-and-doe.fr',
   },
   {
     id: 'dd-arum',
@@ -94,6 +99,7 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 1.00 },
     ],
     piecesCount: 3,
+    url: 'https://www.deer-and-doe.fr',
   },
   {
     id: 'dd-epicea',
@@ -110,6 +116,7 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 1.60 },
     ],
     piecesCount: 7,
+    url: 'https://www.deer-and-doe.fr',
   },
   {
     id: 'dd-clematis',
@@ -126,6 +133,7 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 2.80 },
     ],
     piecesCount: 12,
+    url: 'https://www.deer-and-doe.fr',
   },
   {
     id: 'dd-cosmos',
@@ -142,6 +150,7 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 0.95 },
     ],
     piecesCount: 4,
+    url: 'https://www.deer-and-doe.fr',
   },
   {
     id: 'dd-sureau',
@@ -158,6 +167,7 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 150, meters: 1.70 },
     ],
     piecesCount: 5,
+    url: 'https://www.deer-and-doe.fr',
   },
   {
     id: 'dd-ophrys',
@@ -174,6 +184,7 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 2.40 },
     ],
     piecesCount: 7,
+    url: 'https://www.deer-and-doe.fr',
   },
   {
     id: 'dd-edelweiss',
@@ -190,9 +201,44 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 3.80 },
     ],
     piecesCount: 14,
+    url: 'https://www.deer-and-doe.fr',
+  },
+  {
+    id: 'dd-magnolia',
+    name: 'Magnolia',
+    designer: 'Deer & Doe',
+    clothingType: 'blouse',
+    difficulty: 'moyen',
+    description: 'Blouse avec empiècement dos, patte de boutonnage et poches poitrine. Style chemisier féminin.',
+    sizes: ['34','36','38','40','42','44','46'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 1.55 },
+      { size: '38', widthCm: 140, meters: 1.65 },
+      { size: '40', widthCm: 140, meters: 1.75 },
+      { size: '42', widthCm: 140, meters: 1.85 },
+    ],
+    piecesCount: 8,
+    url: 'https://www.deer-and-doe.fr',
+  },
+  {
+    id: 'dd-pivoine',
+    name: 'Pivoine',
+    designer: 'Deer & Doe',
+    clothingType: 'veste',
+    difficulty: 'moyen',
+    description: 'Veste courte cintrée à col montant avec poches plaquées et dos à plis. Tissu tissé épais.',
+    sizes: ['34','36','38','40','42','44','46'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 1.80 },
+      { size: '38', widthCm: 140, meters: 1.90 },
+      { size: '40', widthCm: 140, meters: 2.00 },
+      { size: '42', widthCm: 140, meters: 2.15 },
+    ],
+    piecesCount: 9,
+    url: 'https://www.deer-and-doe.fr',
   },
 
-  /* ── Camimade ───────────────────────────────────────────────── */
+  /* ── Camimade ───────────────────────────────────────────────────── */
   {
     id: 'cami-pepite',
     name: 'Pépite',
@@ -209,6 +255,7 @@ const catalog: CatalogEntry[] = [
       { size: '44', widthCm: 140, meters: 2.50 },
     ],
     piecesCount: 5,
+    url: 'https://www.camimade.com',
   },
   {
     id: 'cami-capsule',
@@ -225,6 +272,7 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 1.80 },
     ],
     piecesCount: 6,
+    url: 'https://www.camimade.com',
   },
   {
     id: 'cami-midnight',
@@ -241,6 +289,7 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 1.75 },
     ],
     piecesCount: 6,
+    url: 'https://www.camimade.com',
   },
   {
     id: 'cami-stardust',
@@ -257,9 +306,10 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 2.70 },
     ],
     piecesCount: 8,
+    url: 'https://www.camimade.com',
   },
 
-  /* ── Ikatee ─────────────────────────────────────────────────── */
+  /* ── Ikatee ──────────────────────────────────────────────────────── */
   {
     id: 'ika-emma',
     name: 'Emma',
@@ -275,6 +325,7 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 1.65 },
     ],
     piecesCount: 5,
+    url: 'https://ikatee.fr',
   },
   {
     id: 'ika-penelope',
@@ -291,6 +342,7 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 2.80 },
     ],
     piecesCount: 9,
+    url: 'https://ikatee.fr',
   },
   {
     id: 'ika-lena',
@@ -307,9 +359,27 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 150, meters: 1.90 },
     ],
     piecesCount: 4,
+    url: 'https://ikatee.fr',
+  },
+  {
+    id: 'ika-jo',
+    name: 'Jo',
+    designer: 'Ikatee',
+    clothingType: 'pantalon',
+    difficulty: 'facile',
+    description: 'Pantalon large taille haute en jersey ou tissu léger, coutures plates et bas droit.',
+    sizes: ['36','38','40','42','44','46'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 1.40 },
+      { size: '38', widthCm: 140, meters: 1.50 },
+      { size: '40', widthCm: 140, meters: 1.60 },
+      { size: '42', widthCm: 140, meters: 1.70 },
+    ],
+    piecesCount: 4,
+    url: 'https://ikatee.fr',
   },
 
-  /* ── République du Chiffon ──────────────────────────────────── */
+  /* ── République du Chiffon ──────────────────────────────────────── */
   {
     id: 'rdc-zoe',
     name: 'Zoé',
@@ -325,6 +395,7 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 2.05 },
     ],
     piecesCount: 5,
+    url: 'https://www.republique-du-chiffon.com',
   },
   {
     id: 'rdc-eugenie',
@@ -341,6 +412,7 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 1.75 },
     ],
     piecesCount: 7,
+    url: 'https://www.republique-du-chiffon.com',
   },
   {
     id: 'rdc-anatole',
@@ -357,6 +429,7 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 1.80 },
     ],
     piecesCount: 6,
+    url: 'https://www.republique-du-chiffon.com',
   },
   {
     id: 'rdc-leon',
@@ -373,9 +446,10 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 1.75 },
     ],
     piecesCount: 6,
+    url: 'https://www.republique-du-chiffon.com',
   },
 
-  /* ── Burda Style ────────────────────────────────────────────── */
+  /* ── Burda Style ────────────────────────────────────────────────── */
   {
     id: 'burda-112-2023',
     name: 'Robe trapèze 112',
@@ -391,6 +465,7 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 1.85 },
     ],
     piecesCount: 3,
+    url: 'https://www.burdastyle.fr',
   },
   {
     id: 'burda-203-2022',
@@ -407,9 +482,10 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 2.25 },
     ],
     piecesCount: 14,
+    url: 'https://www.burdastyle.fr',
   },
 
-  /* ── Named Clothing ─────────────────────────────────────────── */
+  /* ── Named Clothing ─────────────────────────────────────────────── */
   {
     id: 'named-valo',
     name: 'Valo Wrap',
@@ -425,6 +501,7 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 2.60 },
     ],
     piecesCount: 7,
+    url: 'https://namedclothing.com',
   },
   {
     id: 'named-otso',
@@ -441,6 +518,7 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 3.40 },
     ],
     piecesCount: 11,
+    url: 'https://namedclothing.com',
   },
   {
     id: 'named-saga',
@@ -457,9 +535,45 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 2.40 },
     ],
     piecesCount: 8,
+    url: 'https://namedclothing.com',
+  },
+  {
+    id: 'named-kielo',
+    name: 'Kielo Wave',
+    designer: 'Named Clothing',
+    clothingType: 'robe',
+    difficulty: 'facile',
+    description: 'Robe ou top en jersey fluide avec empiècements de couleur et découpe en vague au buste.',
+    sizes: ['34','36','38','40','42','44','46','48','50','52'],
+    fabricReqs: [
+      { size: '36', widthCm: 150, meters: 1.60 },
+      { size: '38', widthCm: 150, meters: 1.70 },
+      { size: '40', widthCm: 150, meters: 1.80 },
+      { size: '42', widthCm: 150, meters: 1.90 },
+      { size: '44', widthCm: 150, meters: 2.00 },
+    ],
+    piecesCount: 6,
+    url: 'https://namedclothing.com',
+  },
+  {
+    id: 'named-helsinki',
+    name: 'Helsinki',
+    designer: 'Named Clothing',
+    clothingType: 'manteau',
+    difficulty: 'difficile',
+    description: 'Manteau long col croisé avec grandes poches et ceinture. Silhouette structurée minimaliste nordique.',
+    sizes: ['34','36','38','40','42','44','46','48'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 3.00 },
+      { size: '38', widthCm: 140, meters: 3.20 },
+      { size: '40', widthCm: 140, meters: 3.40 },
+      { size: '42', widthCm: 140, meters: 3.60 },
+    ],
+    piecesCount: 12,
+    url: 'https://namedclothing.com',
   },
 
-  /* ── Fibre Mood ─────────────────────────────────────────────── */
+  /* ── Fibre Mood ─────────────────────────────────────────────────── */
   {
     id: 'fm-gio',
     name: 'Gio',
@@ -475,6 +589,7 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 1.80 },
     ],
     piecesCount: 4,
+    url: 'https://fibremood.com',
   },
   {
     id: 'fm-josie',
@@ -491,6 +606,7 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 150, meters: 1.80 },
     ],
     piecesCount: 4,
+    url: 'https://fibremood.com',
   },
   {
     id: 'fm-diana',
@@ -507,6 +623,7 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 1.70 },
     ],
     piecesCount: 5,
+    url: 'https://fibremood.com',
   },
   {
     id: 'fm-morgan',
@@ -523,9 +640,44 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 2.45 },
     ],
     piecesCount: 9,
+    url: 'https://fibremood.com',
+  },
+  {
+    id: 'fm-edeline',
+    name: 'Edeline',
+    designer: 'Fibre Mood',
+    clothingType: 'robe',
+    difficulty: 'moyen',
+    description: 'Robe midi avec corsage ajusté, col montant et jupe large froncée. Tissu fleuri conseillé.',
+    sizes: ['34','36','38','40','42','44','46','48'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 2.50 },
+      { size: '38', widthCm: 140, meters: 2.65 },
+      { size: '40', widthCm: 140, meters: 2.80 },
+      { size: '42', widthCm: 140, meters: 2.95 },
+    ],
+    piecesCount: 7,
+    url: 'https://fibremood.com',
+  },
+  {
+    id: 'fm-pip',
+    name: 'Pip',
+    designer: 'Fibre Mood',
+    clothingType: 'sweat',
+    difficulty: 'facile',
+    description: 'Sweat col rond en molleton avec coutures nervures et bas bord-côte. Coupe classique confortable.',
+    sizes: ['34','36','38','40','42','44','46','48'],
+    fabricReqs: [
+      { size: '36', widthCm: 150, meters: 1.40 },
+      { size: '38', widthCm: 150, meters: 1.50 },
+      { size: '40', widthCm: 150, meters: 1.60 },
+      { size: '42', widthCm: 150, meters: 1.70 },
+    ],
+    piecesCount: 5,
+    url: 'https://fibremood.com',
   },
 
-  /* ── Tilly and the Buttons ──────────────────────────────────── */
+  /* ── Tilly and the Buttons ──────────────────────────────────────── */
   {
     id: 'tilly-coco',
     name: 'Coco',
@@ -541,6 +693,7 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 150, meters: 1.20 },
     ],
     piecesCount: 3,
+    url: 'https://tillyandthebuttons.com',
   },
   {
     id: 'tilly-agnes',
@@ -557,6 +710,7 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 1.80 },
     ],
     piecesCount: 3,
+    url: 'https://tillyandthebuttons.com',
   },
   {
     id: 'tilly-bettine',
@@ -573,16 +727,34 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 2.40 },
     ],
     piecesCount: 6,
+    url: 'https://tillyandthebuttons.com',
+  },
+  {
+    id: 'tilly-cleo',
+    name: 'Cleo',
+    designer: 'Tilly and the Buttons',
+    clothingType: 'combinaison',
+    difficulty: 'moyen',
+    description: 'Combinaison courte col carré, manches kimono et culotte shorts. Tissu fluide recommandé.',
+    sizes: ['34','36','38','40','42','44','46','48','50'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 1.80 },
+      { size: '38', widthCm: 140, meters: 1.95 },
+      { size: '40', widthCm: 140, meters: 2.05 },
+      { size: '42', widthCm: 140, meters: 2.20 },
+    ],
+    piecesCount: 6,
+    url: 'https://tillyandthebuttons.com',
   },
 
-  /* ── Grainline Studio ───────────────────────────────────────── */
+  /* ── Grainline Studio ───────────────────────────────────────────── */
   {
     id: 'gs-scout',
     name: 'Scout',
     designer: 'Grainline Studio',
     clothingType: 't-shirt',
     difficulty: 'facile',
-    description: 'T-shirt en jersey avec col en V, petites poches poitrine option. Coupe casual américaine.',
+    description: 'T-shirt en jersey avec col en V, petite poche poitrine optionnelle. Coupe casual américaine.',
     sizes: ['34','36','38','40','42','44','46','48'],
     fabricReqs: [
       { size: '36', widthCm: 150, meters: 0.95 },
@@ -591,6 +763,7 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 150, meters: 1.25 },
     ],
     piecesCount: 4,
+    url: 'https://grainlinestudio.com',
   },
   {
     id: 'gs-linden',
@@ -607,6 +780,7 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 150, meters: 1.80 },
     ],
     piecesCount: 6,
+    url: 'https://grainlinestudio.com',
   },
   {
     id: 'gs-archer',
@@ -623,16 +797,17 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 2.15 },
     ],
     piecesCount: 10,
+    url: 'https://grainlinestudio.com',
   },
 
-  /* ── Maison Fauve ───────────────────────────────────────────── */
+  /* ── Maison Fauve ───────────────────────────────────────────────── */
   {
     id: 'mf-rosehip',
     name: 'Rose Hip',
     designer: 'Maison Fauve',
     clothingType: 'robe',
     difficulty: 'facile',
-    description: 'Robe évasée style années 50 avec petits pois ou imprimé. Col bateau et fermeture dos.',
+    description: 'Robe évasée style années 50 avec col bateau et fermeture dos. Idéale pour les imprimés.',
     sizes: ['34','36','38','40','42','44','46'],
     fabricReqs: [
       { size: '36', widthCm: 140, meters: 1.70 },
@@ -641,6 +816,7 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 2.00 },
     ],
     piecesCount: 5,
+    url: 'https://www.maisonfauve.com',
   },
   {
     id: 'mf-amarante',
@@ -657,6 +833,7 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 1.85 },
     ],
     piecesCount: 6,
+    url: 'https://www.maisonfauve.com',
   },
   {
     id: 'mf-bouton-or',
@@ -673,9 +850,27 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 2.40 },
     ],
     piecesCount: 6,
+    url: 'https://www.maisonfauve.com',
+  },
+  {
+    id: 'mf-jasmin',
+    name: 'Jasmin',
+    designer: 'Maison Fauve',
+    clothingType: 'jupe',
+    difficulty: 'facile',
+    description: 'Jupe mi-longue à taille haute élastiquée avec volant bas. Esprit bohème et romantique.',
+    sizes: ['34','36','38','40','42','44','46'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 1.20 },
+      { size: '38', widthCm: 140, meters: 1.30 },
+      { size: '40', widthCm: 140, meters: 1.40 },
+      { size: '42', widthCm: 140, meters: 1.50 },
+    ],
+    piecesCount: 3,
+    url: 'https://www.maisonfauve.com',
   },
 
-  /* ── Atelier Scammit ────────────────────────────────────────── */
+  /* ── Atelier Scammit ────────────────────────────────────────────── */
   {
     id: 'as-alexia',
     name: 'Alexia',
@@ -691,6 +886,7 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 1.90 },
     ],
     piecesCount: 4,
+    url: 'https://www.atelierscammit.com',
   },
   {
     id: 'as-moline',
@@ -707,6 +903,7 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 1.75 },
     ],
     piecesCount: 4,
+    url: 'https://www.atelierscammit.com',
   },
   {
     id: 'as-margot',
@@ -723,16 +920,17 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 1.70 },
     ],
     piecesCount: 3,
+    url: 'https://www.atelierscammit.com',
   },
 
-  /* ── Closet Core Patterns ──────────────────────────────────── */
+  /* ── Closet Core Patterns ───────────────────────────────────────── */
   {
     id: 'cc-kalle',
     name: 'Kalle',
     designer: 'Closet Core Patterns',
     clothingType: 'chemise',
     difficulty: 'moyen',
-    description: 'Chemise ou robe-chemise boutonnée avec col classique, manches longues et poignets boutonnés. Tissu léger tissé.',
+    description: 'Chemise ou robe-chemise boutonnée avec col classique, manches longues et poignets boutonnés.',
     sizes: ['34','36','38','40','42','44','46','48','50','52'],
     fabricReqs: [
       { size: '36', widthCm: 140, meters: 1.80 },
@@ -742,6 +940,7 @@ const catalog: CatalogEntry[] = [
       { size: '44', widthCm: 140, meters: 2.35 },
     ],
     piecesCount: 11,
+    url: 'https://closetcorepatterns.com',
   },
   {
     id: 'cc-ebony',
@@ -759,6 +958,7 @@ const catalog: CatalogEntry[] = [
       { size: '44', widthCm: 150, meters: 1.40 },
     ],
     piecesCount: 5,
+    url: 'https://closetcorepatterns.com',
   },
   {
     id: 'cc-sydney',
@@ -775,9 +975,10 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 2.45 },
     ],
     piecesCount: 13,
+    url: 'https://closetcorepatterns.com',
   },
 
-  /* ── True Bias ──────────────────────────────────────────────── */
+  /* ── True Bias ──────────────────────────────────────────────────── */
   {
     id: 'tb-ogden',
     name: 'Ogden Cami',
@@ -794,6 +995,7 @@ const catalog: CatalogEntry[] = [
       { size: '44', widthCm: 140, meters: 1.50 },
     ],
     piecesCount: 4,
+    url: 'https://truebias.com',
   },
   {
     id: 'tb-hudson',
@@ -811,6 +1013,7 @@ const catalog: CatalogEntry[] = [
       { size: '44', widthCm: 140, meters: 1.90 },
     ],
     piecesCount: 6,
+    url: 'https://truebias.com',
   },
   {
     id: 'tb-marlo',
@@ -827,9 +1030,10 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 2.00 },
     ],
     piecesCount: 8,
+    url: 'https://truebias.com',
   },
 
-  /* ── Friday Pattern Co ──────────────────────────────────────── */
+  /* ── Friday Pattern Co ──────────────────────────────────────────── */
   {
     id: 'fp-wilder',
     name: 'Wilder Gown',
@@ -845,6 +1049,7 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 3.30 },
     ],
     piecesCount: 6,
+    url: 'https://fridaypatterncompany.com',
   },
   {
     id: 'fp-laurel',
@@ -861,6 +1066,7 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 1.20 },
     ],
     piecesCount: 5,
+    url: 'https://fridaypatterncompany.com',
   },
   {
     id: 'fp-cielo',
@@ -877,9 +1083,10 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 2.00 },
     ],
     piecesCount: 4,
+    url: 'https://fridaypatterncompany.com',
   },
 
-  /* ── Sew Over It ────────────────────────────────────────────── */
+  /* ── Sew Over It ────────────────────────────────────────────────── */
   {
     id: 'soi-shift',
     name: 'Ultimate Shift Dress',
@@ -895,6 +1102,7 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 1.85 },
     ],
     piecesCount: 4,
+    url: 'https://sewoverit.co.uk',
   },
   {
     id: 'soi-tea',
@@ -911,6 +1119,7 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 3.25 },
     ],
     piecesCount: 8,
+    url: 'https://sewoverit.co.uk',
   },
   {
     id: 'soi-lisa',
@@ -927,9 +1136,10 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 1.60 },
     ],
     piecesCount: 7,
+    url: 'https://sewoverit.co.uk',
   },
 
-  /* ── Merchant & Mills ───────────────────────────────────────── */
+  /* ── Merchant & Mills ───────────────────────────────────────────── */
   {
     id: 'mm-waterfront',
     name: 'Waterfront',
@@ -945,6 +1155,7 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 3.05 },
     ],
     piecesCount: 10,
+    url: 'https://merchantandmills.com',
   },
   {
     id: 'mm-birch',
@@ -961,6 +1172,7 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 2.00 },
     ],
     piecesCount: 9,
+    url: 'https://merchantandmills.com',
   },
   {
     id: 'mm-driftwood',
@@ -968,7 +1180,7 @@ const catalog: CatalogEntry[] = [
     designer: 'Merchant & Mills',
     clothingType: 'pantalon',
     difficulty: 'moyen',
-    description: 'Pantalon sailor vintage taille haute avec braguette boutonnée et jambes larges. Tissu tissé épais.',
+    description: 'Pantalon sailor vintage taille haute avec braguette boutonnée et jambes larges.',
     sizes: ['34','36','38','40','42','44','46'],
     fabricReqs: [
       { size: '36', widthCm: 140, meters: 1.60 },
@@ -977,9 +1189,10 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 1.95 },
     ],
     piecesCount: 8,
+    url: 'https://merchantandmills.com',
   },
 
-  /* ── Pauline Alice ──────────────────────────────────────────── */
+  /* ── Pauline Alice ──────────────────────────────────────────────── */
   {
     id: 'pa-maris',
     name: 'Maris',
@@ -995,6 +1208,7 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 1.70 },
     ],
     piecesCount: 5,
+    url: 'https://pauline-alice.com',
   },
   {
     id: 'pa-uyuni',
@@ -1011,6 +1225,7 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 2.40 },
     ],
     piecesCount: 4,
+    url: 'https://pauline-alice.com',
   },
   {
     id: 'pa-ronda',
@@ -1027,9 +1242,10 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 2.75 },
     ],
     piecesCount: 2,
+    url: 'https://pauline-alice.com',
   },
 
-  /* ── Style Arc ──────────────────────────────────────────────── */
+  /* ── Style Arc ──────────────────────────────────────────────────── */
   {
     id: 'sa-tamsin',
     name: 'Tamsin',
@@ -1045,6 +1261,7 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 2.00 },
     ],
     piecesCount: 8,
+    url: 'https://www.stylearc.com.au',
   },
   {
     id: 'sa-ginger',
@@ -1061,9 +1278,10 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 150, meters: 1.50 },
     ],
     piecesCount: 4,
+    url: 'https://www.stylearc.com.au',
   },
 
-  /* ── Papercut Patterns ──────────────────────────────────────── */
+  /* ── Papercut Patterns ──────────────────────────────────────────── */
   {
     id: 'pp-gravity',
     name: 'Gravity',
@@ -1079,6 +1297,7 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 2.20 },
     ],
     piecesCount: 7,
+    url: 'https://papercutpatterns.com',
   },
   {
     id: 'pp-elements',
@@ -1095,9 +1314,10 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 150, meters: 1.90 },
     ],
     piecesCount: 6,
+    url: 'https://papercutpatterns.com',
   },
 
-  /* ── Simplicity / McCall's ──────────────────────────────────── */
+  /* ── Simplicity ─────────────────────────────────────────────────── */
   {
     id: 'sim-9190',
     name: 'Simplicity 9190',
@@ -1114,6 +1334,7 @@ const catalog: CatalogEntry[] = [
       { size: '44', widthCm: 150, meters: 1.90 },
     ],
     piecesCount: 3,
+    url: 'https://www.simplicity.com',
   },
   {
     id: 'sim-8587',
@@ -1130,7 +1351,10 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 1.05 },
     ],
     piecesCount: 4,
+    url: 'https://www.simplicity.com',
   },
+
+  /* ── McCall's ───────────────────────────────────────────────────── */
   {
     id: 'mc-7958',
     name: 'McCall\'s 7958',
@@ -1146,16 +1370,17 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 2.65 },
     ],
     piecesCount: 7,
+    url: 'https://mccallpattern.mccall.com',
   },
 
-  /* ── Deer & Doe (suite) ─────────────────────────────────────── */
+  /* ── Vogue Patterns ─────────────────────────────────────────────── */
   {
-    id: 'dd-magnolia',
-    name: 'Magnolia',
-    designer: 'Deer & Doe',
+    id: 'vogue-v9252',
+    name: 'Vogue V9252',
+    designer: 'Vogue Patterns',
     clothingType: 'blouse',
     difficulty: 'moyen',
-    description: 'Blouse avec empiècement dos, patte de boutonnage et poches poitrine. Style chemisier féminin.',
+    description: 'Blouse fluide à encolure froncée, manches courtes ou bouffantes. Tissu léger conseillé.',
     sizes: ['34','36','38','40','42','44','46'],
     fabricReqs: [
       { size: '36', widthCm: 140, meters: 1.55 },
@@ -1163,34 +1388,163 @@ const catalog: CatalogEntry[] = [
       { size: '40', widthCm: 140, meters: 1.75 },
       { size: '42', widthCm: 140, meters: 1.85 },
     ],
-    piecesCount: 8,
+    piecesCount: 5,
+    url: 'https://voguepatterns.mccall.com',
   },
   {
-    id: 'dd-pivoine',
-    name: 'Pivoine',
-    designer: 'Deer & Doe',
+    id: 'vogue-v8784',
+    name: 'Vogue V8784',
+    designer: 'Vogue Patterns',
+    clothingType: 'robe',
+    difficulty: 'facile',
+    description: 'Robe fourreau ou robe chemise sans col avec ceinture. Lignes épurées et intemporelles.',
+    sizes: ['34','36','38','40','42','44','46'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 1.70 },
+      { size: '38', widthCm: 140, meters: 1.80 },
+      { size: '40', widthCm: 140, meters: 1.90 },
+      { size: '42', widthCm: 140, meters: 2.05 },
+    ],
+    piecesCount: 5,
+    url: 'https://voguepatterns.mccall.com',
+  },
+
+  /* ── Butterick ──────────────────────────────────────────────────── */
+  {
+    id: 'but-b6479',
+    name: 'Butterick B6479',
+    designer: 'Butterick',
+    clothingType: 'robe',
+    difficulty: 'facile',
+    description: 'Robe ou tunique en jersey avec variations d\'encolures et de longueurs. Très accessible.',
+    sizes: ['34','36','38','40','42','44','46','48','50','52'],
+    fabricReqs: [
+      { size: '36', widthCm: 150, meters: 1.40 },
+      { size: '38', widthCm: 150, meters: 1.50 },
+      { size: '40', widthCm: 150, meters: 1.60 },
+      { size: '42', widthCm: 150, meters: 1.70 },
+    ],
+    piecesCount: 4,
+    url: 'https://butterick.mccall.com',
+  },
+  {
+    id: 'but-b6762',
+    name: 'Butterick B6762',
+    designer: 'Butterick',
     clothingType: 'veste',
     difficulty: 'moyen',
-    description: 'Veste courte cintrée à col montant avec poches plaquées et dos à plis. Tissu tissé épais.',
+    description: 'Veste blazer ajustée avec col tailleur, poches à rabat et manches longues.',
     sizes: ['34','36','38','40','42','44','46'],
     fabricReqs: [
       { size: '36', widthCm: 140, meters: 1.80 },
-      { size: '38', widthCm: 140, meters: 1.90 },
-      { size: '40', widthCm: 140, meters: 2.00 },
-      { size: '42', widthCm: 140, meters: 2.15 },
+      { size: '38', widthCm: 140, meters: 1.95 },
+      { size: '40', widthCm: 140, meters: 2.10 },
+      { size: '42', widthCm: 140, meters: 2.25 },
     ],
-    piecesCount: 9,
+    piecesCount: 11,
+    url: 'https://butterick.mccall.com',
   },
 
-  /* ── Fibre Mood (suite) ─────────────────────────────────────── */
+  /* ── Cashmerette ────────────────────────────────────────────────── */
   {
-    id: 'fm-edeline',
-    name: 'Edeline',
-    designer: 'Fibre Mood',
+    id: 'cash-concord',
+    name: 'Concord Tee',
+    designer: 'Cashmerette',
+    clothingType: 't-shirt',
+    difficulty: 'facile',
+    description: 'T-shirt en jersey avec col rond, manches courtes ou longues. Spécialement conçu pour les grandes tailles.',
+    sizes: ['40','42','44','46','48','50','52','54','56','58'],
+    fabricReqs: [
+      { size: '42', widthCm: 150, meters: 1.20 },
+      { size: '44', widthCm: 150, meters: 1.30 },
+      { size: '46', widthCm: 150, meters: 1.40 },
+      { size: '48', widthCm: 150, meters: 1.50 },
+      { size: '50', widthCm: 150, meters: 1.60 },
+    ],
+    piecesCount: 4,
+    url: 'https://cashmerette.com',
+  },
+  {
+    id: 'cash-turner',
+    name: 'Turner Dress',
+    designer: 'Cashmerette',
     clothingType: 'robe',
     difficulty: 'moyen',
-    description: 'Robe midi avec corsage ajusté, col montant et jupe large froncée. Tissu fleuri conseillé.',
+    description: 'Robe ajustée en jersey avec décolleté en V, taille marquée et jupe droite ou évasée. Grande taille.',
+    sizes: ['40','42','44','46','48','50','52','54','56','58'],
+    fabricReqs: [
+      { size: '42', widthCm: 150, meters: 1.90 },
+      { size: '44', widthCm: 150, meters: 2.00 },
+      { size: '46', widthCm: 150, meters: 2.15 },
+      { size: '48', widthCm: 150, meters: 2.25 },
+    ],
+    piecesCount: 6,
+    url: 'https://cashmerette.com',
+  },
+  {
+    id: 'cash-appleton',
+    name: 'Appleton Dress',
+    designer: 'Cashmerette',
+    clothingType: 'robe',
+    difficulty: 'moyen',
+    description: 'Robe chemisier à smocks dans le dos, col claudine et jupe plissée. Grande taille romantique.',
+    sizes: ['40','42','44','46','48','50','52','54','56','58'],
+    fabricReqs: [
+      { size: '42', widthCm: 140, meters: 2.80 },
+      { size: '44', widthCm: 140, meters: 3.00 },
+      { size: '46', widthCm: 140, meters: 3.20 },
+      { size: '48', widthCm: 140, meters: 3.40 },
+    ],
+    piecesCount: 8,
+    url: 'https://cashmerette.com',
+  },
+
+  /* ── Sew House Seven ────────────────────────────────────────────── */
+  {
+    id: 'sh7-toaster',
+    name: 'Toaster Sweater',
+    designer: 'Sew House Seven',
+    clothingType: 'pull',
+    difficulty: 'facile',
+    description: 'Pull oversize col rond en sweat ou molleton avec coutures nervurées apparentes. Iconique.',
+    sizes: ['34','36','38','40','42','44','46','48','50','52'],
+    fabricReqs: [
+      { size: '36', widthCm: 150, meters: 1.30 },
+      { size: '38', widthCm: 150, meters: 1.40 },
+      { size: '40', widthCm: 150, meters: 1.50 },
+      { size: '42', widthCm: 150, meters: 1.60 },
+      { size: '44', widthCm: 150, meters: 1.70 },
+    ],
+    piecesCount: 4,
+    url: 'https://sewhouse7.com',
+  },
+  {
+    id: 'sh7-ginger',
+    name: 'Ginger Jeans',
+    designer: 'Sew House Seven',
+    clothingType: 'pantalon',
+    difficulty: 'difficile',
+    description: 'Jean skinny ou slim avec taille haute, braguette boutonnée et poches réelles. Patron technique.',
     sizes: ['34','36','38','40','42','44','46','48'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 1.60 },
+      { size: '38', widthCm: 140, meters: 1.70 },
+      { size: '40', widthCm: 140, meters: 1.80 },
+      { size: '42', widthCm: 140, meters: 1.90 },
+    ],
+    piecesCount: 14,
+    url: 'https://sewhouse7.com',
+  },
+
+  /* ── By Hand London ─────────────────────────────────────────────── */
+  {
+    id: 'bhl-anna',
+    name: 'Anna Dress',
+    designer: 'By Hand London',
+    clothingType: 'robe',
+    difficulty: 'moyen',
+    description: 'Robe à bretelles avec bustier ajusté par des pinces et jupe circulaire. Style vintage intemporel.',
+    sizes: ['34','36','38','40','42','44','46'],
     fabricReqs: [
       { size: '36', widthCm: 140, meters: 2.50 },
       { size: '38', widthCm: 140, meters: 2.65 },
@@ -1198,14 +1552,159 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 140, meters: 2.95 },
     ],
     piecesCount: 7,
+    url: 'https://byhandlondon.com',
   },
   {
-    id: 'fm-pip',
-    name: 'Pip',
-    designer: 'Fibre Mood',
-    clothingType: 'sweat',
+    id: 'bhl-sybil',
+    name: 'Sybil Dress',
+    designer: 'By Hand London',
+    clothingType: 'robe',
+    difficulty: 'moyen',
+    description: 'Robe à empiècement imprimé avec jupe plissée et taille élastiquée. Style preppy britannique.',
+    sizes: ['34','36','38','40','42','44','46'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 2.20 },
+      { size: '38', widthCm: 140, meters: 2.35 },
+      { size: '40', widthCm: 140, meters: 2.50 },
+      { size: '42', widthCm: 140, meters: 2.65 },
+    ],
+    piecesCount: 6,
+    url: 'https://byhandlondon.com',
+  },
+  {
+    id: 'bhl-victoria',
+    name: 'Victoria Blazer',
+    designer: 'By Hand London',
+    clothingType: 'veste',
+    difficulty: 'difficile',
+    description: 'Blazer tailleur ajusté avec revers crantés, doublure et poches passepoilées. Construction précise.',
+    sizes: ['34','36','38','40','42','44','46'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 2.00 },
+      { size: '38', widthCm: 140, meters: 2.15 },
+      { size: '40', widthCm: 140, meters: 2.30 },
+      { size: '42', widthCm: 140, meters: 2.45 },
+    ],
+    piecesCount: 15,
+    url: 'https://byhandlondon.com',
+  },
+
+  /* ── Seamwork ───────────────────────────────────────────────────── */
+  {
+    id: 'sw-moneta',
+    name: 'Moneta',
+    designer: 'Seamwork',
+    clothingType: 'robe',
     difficulty: 'facile',
-    description: 'Sweat col rond en molleton avec coutures nervures et bas bord-côte. Coupe classique confortable.',
+    description: 'Robe en jersey avec corsage cintré et jupe circulaire. Fermeture élastiquée invisible. Très rapide.',
+    sizes: ['34','36','38','40','42','44','46','48'],
+    fabricReqs: [
+      { size: '36', widthCm: 150, meters: 1.80 },
+      { size: '38', widthCm: 150, meters: 1.90 },
+      { size: '40', widthCm: 150, meters: 2.00 },
+      { size: '42', widthCm: 150, meters: 2.15 },
+    ],
+    piecesCount: 4,
+    url: 'https://www.seamwork.com',
+  },
+  {
+    id: 'sw-sencha',
+    name: 'Sencha',
+    designer: 'Seamwork',
+    clothingType: 'blouse',
+    difficulty: 'moyen',
+    description: 'Blouse col kimono avec patte de boutonnage et manches courtes. Inspiration asiatique subtile.',
+    sizes: ['34','36','38','40','42','44','46'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 1.50 },
+      { size: '38', widthCm: 140, meters: 1.60 },
+      { size: '40', widthCm: 140, meters: 1.70 },
+      { size: '42', widthCm: 140, meters: 1.80 },
+    ],
+    piecesCount: 6,
+    url: 'https://www.seamwork.com',
+  },
+
+  /* ── Chalk and Notch ────────────────────────────────────────────── */
+  {
+    id: 'cn-willow',
+    name: 'Willow',
+    designer: 'Chalk and Notch',
+    clothingType: 'robe',
+    difficulty: 'moyen',
+    description: 'Robe midi à encolure carrée, manches bouffantes et boutons dans le dos. Style vintage moderne.',
+    sizes: ['34','36','38','40','42','44','46','48'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 2.40 },
+      { size: '38', widthCm: 140, meters: 2.55 },
+      { size: '40', widthCm: 140, meters: 2.70 },
+      { size: '42', widthCm: 140, meters: 2.85 },
+    ],
+    piecesCount: 7,
+    url: 'https://chalkandnotch.com',
+  },
+  {
+    id: 'cn-heather',
+    name: 'Heather Coat',
+    designer: 'Chalk and Notch',
+    clothingType: 'manteau',
+    difficulty: 'difficile',
+    description: 'Manteau oversize croisé avec grand col châle, poches poitrine et ceinture à nouer.',
+    sizes: ['34','36','38','40','42','44','46','48'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 2.90 },
+      { size: '38', widthCm: 140, meters: 3.05 },
+      { size: '40', widthCm: 140, meters: 3.20 },
+      { size: '42', widthCm: 140, meters: 3.40 },
+    ],
+    piecesCount: 11,
+    url: 'https://chalkandnotch.com',
+  },
+
+  /* ── Liesl + Co ─────────────────────────────────────────────────── */
+  {
+    id: 'lc-gallery',
+    name: 'Gallery Tunic',
+    designer: 'Liesl + Co',
+    clothingType: 'blouse',
+    difficulty: 'facile',
+    description: 'Tunique ample avec col en V en biais, bandes de couleur optionnelles et finitions soignées.',
+    sizes: ['34','36','38','40','42','44','46'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 1.40 },
+      { size: '38', widthCm: 140, meters: 1.50 },
+      { size: '40', widthCm: 140, meters: 1.60 },
+      { size: '42', widthCm: 140, meters: 1.70 },
+    ],
+    piecesCount: 5,
+    url: 'https://lieslandco.com',
+  },
+  {
+    id: 'lc-maritime',
+    name: 'Maritime Shorts',
+    designer: 'Liesl + Co',
+    clothingType: 'pantalon',
+    difficulty: 'facile',
+    description: 'Short taille haute avec braguette boutonnée, poches et revers. Style preppy nautique.',
+    sizes: ['34','36','38','40','42','44','46'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 0.80 },
+      { size: '38', widthCm: 140, meters: 0.85 },
+      { size: '40', widthCm: 140, meters: 0.90 },
+      { size: '42', widthCm: 140, meters: 1.00 },
+    ],
+    piecesCount: 7,
+    url: 'https://lieslandco.com',
+  },
+
+  /* ── Nina Lee ───────────────────────────────────────────────────── */
+  {
+    id: 'nl-southbank',
+    name: 'Southbank Sweater',
+    designer: 'Nina Lee',
+    clothingType: 'pull',
+    difficulty: 'facile',
+    description: 'Pull oversize col rond en sweat ou jersey lourd avec coutures relâchées. Esprit London décontracté.',
     sizes: ['34','36','38','40','42','44','46','48'],
     fabricReqs: [
       { size: '36', widthCm: 150, meters: 1.40 },
@@ -1214,98 +1713,204 @@ const catalog: CatalogEntry[] = [
       { size: '42', widthCm: 150, meters: 1.70 },
     ],
     piecesCount: 5,
-  },
-
-  /* ── Named Clothing (suite) ─────────────────────────────────── */
-  {
-    id: 'named-kielo',
-    name: 'Kielo Wave',
-    designer: 'Named Clothing',
-    clothingType: 'robe',
-    difficulty: 'facile',
-    description: 'Robe ou top en jersey fluide avec empiècements de couleur et découpe en vague au buste.',
-    sizes: ['34','36','38','40','42','44','46','48','50','52'],
-    fabricReqs: [
-      { size: '36', widthCm: 150, meters: 1.60 },
-      { size: '38', widthCm: 150, meters: 1.70 },
-      { size: '40', widthCm: 150, meters: 1.80 },
-      { size: '42', widthCm: 150, meters: 1.90 },
-      { size: '44', widthCm: 150, meters: 2.00 },
-    ],
-    piecesCount: 6,
+    url: 'https://www.nina-lee.co.uk',
   },
   {
-    id: 'named-helsinki',
-    name: 'Helsinki',
-    designer: 'Named Clothing',
-    clothingType: 'manteau',
-    difficulty: 'difficile',
-    description: 'Manteau long col croisé avec grandes poches et ceinture. Silhouette structurée minimaliste nordique.',
-    sizes: ['34','36','38','40','42','44','46','48'],
-    fabricReqs: [
-      { size: '36', widthCm: 140, meters: 3.00 },
-      { size: '38', widthCm: 140, meters: 3.20 },
-      { size: '40', widthCm: 140, meters: 3.40 },
-      { size: '42', widthCm: 140, meters: 3.60 },
-    ],
-    piecesCount: 12,
-  },
-
-  /* ── Tilly and the Buttons (suite) ─────────────────────────── */
-  {
-    id: 'tilly-cleo',
-    name: 'Cleo',
-    designer: 'Tilly and the Buttons',
-    clothingType: 'combinaison',
+    id: 'nl-chelsea',
+    name: 'Chelsea Blouse',
+    designer: 'Nina Lee',
+    clothingType: 'blouse',
     difficulty: 'moyen',
-    description: 'Combinaison courte col carré, manches kimono et culotte shorts. Tissu fluide recommandé.',
-    sizes: ['34','36','38','40','42','44','46','48','50'],
-    fabricReqs: [
-      { size: '36', widthCm: 140, meters: 1.80 },
-      { size: '38', widthCm: 140, meters: 1.95 },
-      { size: '40', widthCm: 140, meters: 2.05 },
-      { size: '42', widthCm: 140, meters: 2.20 },
-    ],
-    piecesCount: 6,
-  },
-
-  /* ── Ikatee (suite) ─────────────────────────────────────────── */
-  {
-    id: 'ika-jo',
-    name: 'Jo',
-    designer: 'Ikatee',
-    clothingType: 'pantalon',
-    difficulty: 'facile',
-    description: 'Pantalon large taille haute en jersey ou tissu léger, coutures plates et bas droit.',
-    sizes: ['36','38','40','42','44','46'],
-    fabricReqs: [
-      { size: '36', widthCm: 140, meters: 1.40 },
-      { size: '38', widthCm: 140, meters: 1.50 },
-      { size: '40', widthCm: 140, meters: 1.60 },
-      { size: '42', widthCm: 140, meters: 1.70 },
-    ],
-    piecesCount: 4,
-  },
-
-  /* ── Maison Fauve (suite) ───────────────────────────────────── */
-  {
-    id: 'mf-jasmin',
-    name: 'Jasmin',
-    designer: 'Maison Fauve',
-    clothingType: 'jupe',
-    difficulty: 'facile',
-    description: 'Jupe mi-longue à taille haute élastiquée avec volant bas. Esprit bohème et romantique.',
+    description: 'Blouse à col noué (pussy bow) avec boutons dans le dos et manches longues légèrement bouffantes.',
     sizes: ['34','36','38','40','42','44','46'],
     fabricReqs: [
-      { size: '36', widthCm: 140, meters: 1.20 },
-      { size: '38', widthCm: 140, meters: 1.30 },
-      { size: '40', widthCm: 140, meters: 1.40 },
-      { size: '42', widthCm: 140, meters: 1.50 },
+      { size: '36', widthCm: 140, meters: 1.55 },
+      { size: '38', widthCm: 140, meters: 1.65 },
+      { size: '40', widthCm: 140, meters: 1.75 },
+      { size: '42', widthCm: 140, meters: 1.85 },
     ],
-    piecesCount: 3,
+    piecesCount: 7,
+    url: 'https://www.nina-lee.co.uk',
   },
 
-  /* ── Patrons libres ─────────────────────────────────────────── */
+  /* ── Itch to Stitch ─────────────────────────────────────────────── */
+  {
+    id: 'its-cascade',
+    name: 'Cascade Jacket',
+    designer: 'Itch to Stitch',
+    clothingType: 'veste',
+    difficulty: 'moyen',
+    description: 'Veste longue fluide à col en cascade avec poches avant. Tissu drapé ou crêpe recommandé.',
+    sizes: ['34','36','38','40','42','44','46','48','50','52'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 1.80 },
+      { size: '38', widthCm: 140, meters: 1.90 },
+      { size: '40', widthCm: 140, meters: 2.00 },
+      { size: '42', widthCm: 140, meters: 2.15 },
+    ],
+    piecesCount: 6,
+    url: 'https://itchtostitch.com',
+  },
+
+  /* ── Hey June Handmade ──────────────────────────────────────────── */
+  {
+    id: 'hj-carmine',
+    name: 'Carmine Top',
+    designer: 'Hey June Handmade',
+    clothingType: 'blouse',
+    difficulty: 'facile',
+    description: 'Top ajusté avec découpes en éventail sur l\'encolure. Tissu léger ou jersey fin recommandé.',
+    sizes: ['34','36','38','40','42','44','46','48'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 0.95 },
+      { size: '38', widthCm: 140, meters: 1.05 },
+      { size: '40', widthCm: 140, meters: 1.15 },
+      { size: '42', widthCm: 140, meters: 1.25 },
+    ],
+    piecesCount: 4,
+    url: 'https://heyjunehandmade.com',
+  },
+  {
+    id: 'hj-sequoia',
+    name: 'Sequoia Tee',
+    designer: 'Hey June Handmade',
+    clothingType: 't-shirt',
+    difficulty: 'facile',
+    description: 'T-shirt jersey ou pull léger avec encolure ronde et manches raglan courtes ou longues.',
+    sizes: ['34','36','38','40','42','44','46','48'],
+    fabricReqs: [
+      { size: '36', widthCm: 150, meters: 1.00 },
+      { size: '38', widthCm: 150, meters: 1.10 },
+      { size: '40', widthCm: 150, meters: 1.20 },
+      { size: '42', widthCm: 150, meters: 1.30 },
+    ],
+    piecesCount: 4,
+    url: 'https://heyjunehandmade.com',
+  },
+
+  /* ── Thread Theory ──────────────────────────────────────────────── */
+  {
+    id: 'tt-strathcona',
+    name: 'Strathcona Henley',
+    designer: 'Thread Theory',
+    clothingType: 't-shirt',
+    difficulty: 'facile',
+    description: 'Henley en jersey avec boutonnage sur l\'encolure, poches poitrine optionnelles et coupe décontractée.',
+    sizes: ['34','36','38','40','42','44','46','48'],
+    fabricReqs: [
+      { size: '36', widthCm: 150, meters: 1.10 },
+      { size: '38', widthCm: 150, meters: 1.20 },
+      { size: '40', widthCm: 150, meters: 1.30 },
+      { size: '42', widthCm: 150, meters: 1.40 },
+    ],
+    piecesCount: 5,
+    url: 'https://www.threadtheorydesigns.com',
+  },
+  {
+    id: 'tt-belvedere',
+    name: 'Belvedere Waistcoat',
+    designer: 'Thread Theory',
+    clothingType: 'veste',
+    difficulty: 'moyen',
+    description: 'Gilet ajusté avec cols variés et doublure. Idéal en drap de laine ou en jean.',
+    sizes: ['34','36','38','40','42','44','46'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 0.90 },
+      { size: '38', widthCm: 140, meters: 1.00 },
+      { size: '40', widthCm: 140, meters: 1.10 },
+      { size: '42', widthCm: 140, meters: 1.20 },
+    ],
+    piecesCount: 8,
+    url: 'https://www.threadtheorydesigns.com',
+  },
+
+  /* ── Wardrobe by Me ─────────────────────────────────────────────── */
+  {
+    id: 'wbm-mathilde',
+    name: 'Mathilde',
+    designer: 'Wardrobe by Me',
+    clothingType: 'blouse',
+    difficulty: 'moyen',
+    description: 'Blouse avec détails de couture précis et col varié. Style scandinave épuré, instructions détaillées.',
+    sizes: ['34','36','38','40','42','44','46'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 1.50 },
+      { size: '38', widthCm: 140, meters: 1.60 },
+      { size: '40', widthCm: 140, meters: 1.70 },
+      { size: '42', widthCm: 140, meters: 1.80 },
+    ],
+    piecesCount: 7,
+    url: 'https://wardrobebyme.com',
+  },
+
+  /* ── Freesewing (patrons libres & open source) ──────────────────── */
+  {
+    id: 'fs-teagan',
+    name: 'Teagan',
+    designer: 'Freesewing',
+    clothingType: 't-shirt',
+    difficulty: 'facile',
+    description: 'T-shirt en jersey patron paramétrique gratuit et open source. Ajusté à vos mensurations exactes.',
+    sizes: ['34','36','38','40','42','44','46','48','50','52'],
+    fabricReqs: [
+      { size: '36', widthCm: 150, meters: 1.00 },
+      { size: '38', widthCm: 150, meters: 1.10 },
+      { size: '40', widthCm: 150, meters: 1.20 },
+      { size: '42', widthCm: 150, meters: 1.30 },
+    ],
+    piecesCount: 3,
+    url: 'https://freesewing.org/designs/teagan',
+  },
+  {
+    id: 'fs-simon',
+    name: 'Simon',
+    designer: 'Freesewing',
+    clothingType: 'chemise',
+    difficulty: 'moyen',
+    description: 'Chemise boutonnée paramétrique, 100 % gratuite et open source. Personnalisable à l\'infini.',
+    sizes: ['34','36','38','40','42','44','46','48','50','52'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 2.00 },
+      { size: '38', widthCm: 140, meters: 2.10 },
+      { size: '40', widthCm: 140, meters: 2.25 },
+      { size: '42', widthCm: 140, meters: 2.40 },
+    ],
+    piecesCount: 12,
+    url: 'https://freesewing.org/designs/simon',
+  },
+  {
+    id: 'fs-wahid',
+    name: 'Wahid',
+    designer: 'Freesewing',
+    clothingType: 'veste',
+    difficulty: 'moyen',
+    description: 'Gilet (waistcoat) paramétrique et gratuit avec doublure et poches. Ajustable à toutes tailles.',
+    sizes: ['34','36','38','40','42','44','46','48','50'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 1.00 },
+      { size: '38', widthCm: 140, meters: 1.10 },
+      { size: '40', widthCm: 140, meters: 1.20 },
+      { size: '42', widthCm: 140, meters: 1.30 },
+    ],
+    piecesCount: 9,
+    url: 'https://freesewing.org/designs/wahid',
+  },
+  {
+    id: 'fs-florence',
+    name: 'Florence',
+    designer: 'Freesewing',
+    clothingType: 'accessoire',
+    difficulty: 'facile',
+    description: 'Masque facial paramétrique et gratuit avec ou sans couture au niveau du nez.',
+    sizes: ['unique'],
+    fabricReqs: [
+      { size: 'unique', widthCm: 140, meters: 0.20 },
+    ],
+    piecesCount: 2,
+    url: 'https://freesewing.org/designs/florence',
+  },
+
+  /* ── Patrons libres ─────────────────────────────────────────────── */
   {
     id: 'gratuit-tote-bag',
     name: 'Tote Bag classique',
@@ -1341,7 +1946,7 @@ const catalog: CatalogEntry[] = [
     designer: 'Patron libre',
     clothingType: 'accessoire',
     difficulty: 'facile',
-    description: 'Bandana réversible cousu en deux fois, idéal pour les chutes de tissu. Patron carré simple.',
+    description: 'Bandana réversible cousu en deux fois, idéal pour les chutes de tissu.',
     sizes: ['unique'],
     fabricReqs: [
       { size: 'unique', widthCm: 140, meters: 0.30 },
@@ -1386,6 +1991,35 @@ const catalog: CatalogEntry[] = [
       { size: 'unique', widthCm: 150, meters: 0.30 },
     ],
     piecesCount: 1,
+  },
+  {
+    id: 'gratuit-jupe-droite',
+    name: 'Jupe droite basique',
+    designer: 'Patron libre',
+    clothingType: 'jupe',
+    difficulty: 'facile',
+    description: 'Jupe droite taille élastiquée, deux pièces, ourlet simple. Excellent patron de départ.',
+    sizes: ['36','38','40','42','44','46'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 0.70 },
+      { size: '38', widthCm: 140, meters: 0.75 },
+      { size: '40', widthCm: 140, meters: 0.80 },
+      { size: '42', widthCm: 140, meters: 0.90 },
+    ],
+    piecesCount: 2,
+  },
+  {
+    id: 'gratuit-sac-main',
+    name: 'Sac à main structuré',
+    designer: 'Patron libre',
+    clothingType: 'accessoire',
+    difficulty: 'moyen',
+    description: 'Sac à main avec soufflets, anses en cuir et fermeture aimantée. Thermocollant requis.',
+    sizes: ['unique'],
+    fabricReqs: [
+      { size: 'unique', widthCm: 140, meters: 0.70 },
+    ],
+    piecesCount: 6,
   },
 ];
 

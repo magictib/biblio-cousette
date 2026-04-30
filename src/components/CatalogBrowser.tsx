@@ -292,6 +292,20 @@ export default function CatalogBrowser({ onSelect, onAddPattern, onClose }: Cata
                 );
               })()}
 
+              {selected.url && (
+                <a href={selected.url} target="_blank" rel="noreferrer"
+                  style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+                    width: '100%', padding: '9px 14px', marginBottom: '10px',
+                    borderRadius: '7px', border: '1.5px solid var(--mauve-light)',
+                    backgroundColor: 'white', color: 'var(--mauve)',
+                    fontFamily: 'Georgia, serif', fontSize: '0.85rem', fontWeight: 'bold',
+                    textDecoration: 'none', boxSizing: 'border-box',
+                  }}>
+                  🛒 Voir sur le site
+                </a>
+              )}
+
               <button onClick={handleImport} className="btn-sage" style={{ width: '100%', justifyContent: 'center' }}>
                 ＋ Importer ce patron
               </button>
