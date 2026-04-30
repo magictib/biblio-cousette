@@ -2,20 +2,23 @@ export interface Fabric {
   id: string;
   name: string;
   color: string;
-  width: number; // en cm
-  height: number; // en cm
-  quantity: number;
-  type: string; // coton, lin, jersey, etc.
-  pattern?: string; // motif du tissu
+  width: number;           // largeur de laize en cm (ex: 140)
+  length: number;          // métrage en mètres (ex: 2.5)
+  type: string;
+  pattern?: string;
   notes?: string;
+  photos: string[];        // base64 data URLs (compressées)
+  isScrap: boolean;        // chute de tissu
+  estimatedArea?: number;  // surface estimée en cm² (pour les chutes)
 }
 
 export interface Pattern {
   id: string;
   name: string;
-  clothingType: string; // robe, t-shirt, pantalon, etc.
-  width: number; // en cm
-  height: number; // en cm
+  designer?: string;       // nom de la créatrice
+  clothingType: string;
+  width: number;           // en cm
+  height: number;          // en cm
   difficulty: 'facile' | 'moyen' | 'difficile';
   notes?: string;
 }

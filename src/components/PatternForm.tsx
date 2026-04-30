@@ -7,149 +7,131 @@ interface PatternFormProps {
   onSubmit: (pattern: Omit<Pattern, 'id'>) => void;
 }
 
-export default function PatternForm({ onSubmit }: PatternFormProps) {
-  const [formData, setFormData] = useState({
-    name: '',
-    clothingType: 'robe',
-    width: 60,
-    height: 80,
-    difficulty: 'moyen' as const,
-    notes: '',
-  });
+const CLOTHING_TYPES = ['robe', 't-shirt', 'pantalon', 'jupe', 'veste', 'manteau', 'sous-vêtement', 'accessoire', 'autres'];
 
-  const [unit, setUnit] = useState<'cm' | 'inch'>('cm');
+export default function PatternForm({ onSubmit }: PatternFormProps) {
+  const [name,         setName]         = useState('');
+  const [designer,     setDesigner]     = useState('');
+  const [clothingType, setClothingType] = useState('robe');
+  const [difficulty,   setDifficulty]   = useState<Pattern['difficulty']>('moyen');
+  const [width,        setWidth]        = useState('60');
+  const [height,       setHeight]       = useState('80');
+  const [notes,        setNotes]        = useState('');
+  const [unit,         setUnit]         = useState<'cm' | 'inch'>('cm');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    const width = unit === 'inch' ? formData.width * 2.54 : formData.width;
-    const height = unit === 'inch' ? formData.height * 2.54 : formData.height;
-
+    const factor = unit === 'inch' ? 2.54 : 1;
     onSubmit({
-      ...formData,
-      width,
-      height,
+      name,
+      designer:  designer  || undefined,
+      clothingType,
+      difficulty,
+      width:  (parseFloat(width)  || 60) * factor,
+      height: (parseFloat(height) || 80) * factor,
+      notes: notes || undefined,
     });
-
-    setFormData({
-      name: '',
-      clothingType: 'robe',
-      width: 60,
-      height: 80,
-      difficulty: 'moyen',
-      notes: '',
-    });
+    setName(''); setDesigner(''); setClothingType('robe'); setDifficulty('moyen');
+    setWidth('60'); setHeight('80'); setNotes('');
   };
 
+  const difficultyOptions: { value: Pattern['difficulty']; label: string; color: string }[] = [
+    { value: 'facile',    label: 'Facile',    color: 'var(--sage)' },
+    { value: 'moyen',     label: 'Moyen',     color: 'var(--gold)' },
+    { value: 'difficile', label: 'Difficile', color: '#A04040' },
+  ];
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <h4 className="font-bold text-lg mb-4">Ajouter un nouveau patron</h4>
+    <form onSubmit={handleSubmit}>
+      <h4 style={{ color: 'var(--mauve)', fontFamily: 'Georgia, serif', fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '20px' }}>
+        Ajouter un patron
+      </h4>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '14px' }}>
+
+        {/* Nom */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Nom du patron
-          </label>
-          <input
-            type="text"
-            required
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-            placeholder="Ex: Robe d'été simple"
-          />
+          <label className="field-label">Nom du patron *</label>
+          <input className="field-input" required value={name}
+            onChange={e => setName(e.target.value)} placeholder="Ex : Robe d'été Margot" />
         </div>
 
+        {/* Créatrice — champ dédié */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Type de vêtement
-          </label>
-          <select
-            value={formData.clothingType}
-            onChange={(e) => setFormData({ ...formData, clothingType: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-          >
-            <option>robe</option>
-            <option>t-shirt</option>
-            <option>pantalon</option>
-            <option>jupe</option>
-            <option>veste</option>
-            <option>autres</option>
+          <label className="field-label">Créatrice / Marque</label>
+          <input className="field-input" value={designer}
+            onChange={e => setDesigner(e.target.value)}
+            placeholder="Ex : Deer &amp; Doe, Camimade…" />
+        </div>
+
+        {/* Type */}
+        <div>
+          <label className="field-label">Type de vêtement</label>
+          <select className="field-input" value={clothingType} onChange={e => setClothingType(e.target.value)}>
+            {CLOTHING_TYPES.map(t => <option key={t}>{t}</option>)}
           </select>
         </div>
 
+        {/* Difficulté */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Difficulté
-          </label>
-          <select
-            value={formData.difficulty}
-            onChange={(e) => setFormData({ ...formData, difficulty: e.target.value as any })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-          >
-            <option value="facile">Facile</option>
-            <option value="moyen">Moyen</option>
-            <option value="difficile">Difficile</option>
-          </select>
-        </div>
-
-        <div className="col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Dimensions du patron
-          </label>
-          <div className="flex gap-2 mb-2">
-            <button
-              type="button"
-              onClick={() => setUnit('cm')}
-              className={`px-3 py-1 rounded ${unit === 'cm' ? 'bg-purple-600 text-white' : 'bg-gray-200'}`}
-            >
-              cm
-            </button>
-            <button
-              type="button"
-              onClick={() => setUnit('inch')}
-              className={`px-3 py-1 rounded ${unit === 'inch' ? 'bg-purple-600 text-white' : 'bg-gray-200'}`}
-            >
-              pouces
-            </button>
+          <label className="field-label">Difficulté</label>
+          <div style={{ display: 'flex', gap: '6px' }}>
+            {difficultyOptions.map(d => (
+              <button key={d.value} type="button" onClick={() => setDifficulty(d.value)}
+                style={{
+                  flex: 1, padding: '8px 4px', borderRadius: '6px',
+                  border: `1.5px solid ${difficulty === d.value ? d.color : 'var(--mauve-pale)'}`,
+                  backgroundColor: difficulty === d.value ? d.color : 'transparent',
+                  color: difficulty === d.value ? 'white' : 'var(--brun-mid)',
+                  fontFamily: 'Georgia, serif', fontSize: '0.8rem', cursor: 'pointer',
+                  transition: 'all 0.15s',
+                }}>
+                {d.label}
+              </button>
+            ))}
           </div>
-          <div className="grid grid-cols-2 gap-2">
-            <input
-              type="number"
-              value={formData.width}
-              onChange={(e) => setFormData({ ...formData, width: parseFloat(e.target.value) })}
-              placeholder="Largeur"
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-            />
-            <input
-              type="number"
-              value={formData.height}
-              onChange={(e) => setFormData({ ...formData, height: parseFloat(e.target.value) })}
-              placeholder="Hauteur"
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-            />
+        </div>
+
+        {/* Dimensions */}
+        <div className="col-span-2" style={{ gridColumn: '1 / -1' }}>
+          <label className="field-label">Dimensions du patron</label>
+          <div style={{ display: 'flex', gap: '6px', marginBottom: '10px' }}>
+            {(['cm', 'inch'] as const).map(u => (
+              <button key={u} type="button" onClick={() => setUnit(u)}
+                style={{
+                  padding: '4px 14px', borderRadius: '5px', border: 'none', cursor: 'pointer', fontSize: '0.82rem', fontFamily: 'Georgia, serif',
+                  backgroundColor: unit === u ? 'var(--mauve)' : 'var(--mauve-pale)',
+                  color: unit === u ? 'var(--creme)' : 'var(--brun-mid)',
+                }}>
+                {u === 'cm' ? 'cm' : 'pouces'}
+              </button>
+            ))}
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+            <div>
+              <label style={{ fontSize: '0.75rem', color: 'var(--brun-mid)' }}>Largeur ({unit})</label>
+              <input className="field-input" type="number" min="1" step="1" required
+                value={width} onChange={e => setWidth(e.target.value)} placeholder="60" />
+            </div>
+            <div>
+              <label style={{ fontSize: '0.75rem', color: 'var(--brun-mid)' }}>Hauteur ({unit})</label>
+              <input className="field-input" type="number" min="1" step="1" required
+                value={height} onChange={e => setHeight(e.target.value)} placeholder="80" />
+            </div>
           </div>
         </div>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Notes
-        </label>
-        <textarea
-          value={formData.notes}
-          onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-          placeholder="Notes sur le patron"
-          rows={3}
-        />
+      {/* Notes */}
+      <div style={{ marginBottom: '20px' }}>
+        <label className="field-label">Notes</label>
+        <textarea className="field-input" value={notes} onChange={e => setNotes(e.target.value)}
+          rows={3} style={{ resize: 'vertical' }}
+          placeholder="Tailles disponibles, remarques…" />
       </div>
 
-      <button
-        type="submit"
-        className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium"
-      >
-        Ajouter le patron
+      <button type="submit" className="btn-sage" style={{ width: '100%', justifyContent: 'center' }}>
+        ＋ Ajouter le patron
       </button>
     </form>
   );

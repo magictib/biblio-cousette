@@ -10,167 +10,119 @@ interface VisualizationCanvasProps {
   rotations: { horizontal: boolean; vertical: boolean };
 }
 
-export default function VisualizationCanvas({
-  fabric,
-  pattern,
-  canFit,
-  rotations,
-}: VisualizationCanvasProps) {
+export default function VisualizationCanvas({ fabric, pattern, canFit, rotations }: VisualizationCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Dimensions du canvas
-    const canvasWidth = 500;
-    const canvasHeight = 500;
-    const padding = 20;
-    const maxWidth = canvasWidth - padding * 2;
-    const maxHeight = canvasHeight - padding * 2;
+    const CW = 500, CH = 500, PAD = 20;
+    const maxW = CW - PAD * 2;
+    const maxH = CH - PAD * 2;
 
-    // Échelle pour faire tenir le tissu dans le canvas
-    const scaleX = maxWidth / fabric.width;
-    const scaleY = maxHeight / fabric.height;
-    const scale = Math.min(scaleX, scaleY);
+    /* length est en mètres → convertir en cm pour le canvas */
+    const fabricW = fabric.width;
+    const fabricH = fabric.length * 100;
 
-    const scaledFabricWidth = fabric.width * scale;
-    const scaledFabricHeight = fabric.height * scale;
+    const scale = Math.min(maxW / fabricW, maxH / fabricH);
+    const sfw   = fabricW * scale;
+    const sfh   = fabricH * scale;
+    const fx    = (CW - sfw) / 2;
+    const fy    = (CH - sfh) / 2;
 
-    const fabricX = (canvasWidth - scaledFabricWidth) / 2;
-    const fabricY = (canvasHeight - scaledFabricHeight) / 2;
+    /* Fond */
+    ctx.fillStyle = '#FDFAF2';
+    ctx.fillRect(0, 0, CW, CH);
 
-    // Fond blanc
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-
-    // Grille légère
-    ctx.strokeStyle = '#e5e7eb';
+    /* Grille papier patron */
+    ctx.strokeStyle = 'rgba(196,136,154,0.15)';
     ctx.lineWidth = 0.5;
     for (let i = 0; i <= 10; i++) {
-      const x = (canvasWidth / 10) * i;
-      const y = (canvasHeight / 10) * i;
-      ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, canvasHeight);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(canvasWidth, y);
-      ctx.stroke();
+      const x = (CW / 10) * i, y = (CH / 10) * i;
+      ctx.beginPath(); ctx.moveTo(x, 0);  ctx.lineTo(x, CH); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, y);  ctx.lineTo(CW, y); ctx.stroke();
     }
 
-    // Dessiner le tissu
+    /* Tissu */
     ctx.fillStyle = fabric.color;
-    ctx.fillRect(fabricX, fabricY, scaledFabricWidth, scaledFabricHeight);
+    ctx.fillRect(fx, fy, sfw, sfh);
 
-    // Bordure du tissu
-    ctx.strokeStyle = '#333333';
+    /* Bordure tissu */
+    ctx.strokeStyle = 'var(--mauve, #7A4F5C)';
     ctx.lineWidth = 2;
-    ctx.strokeRect(fabricX, fabricY, scaledFabricWidth, scaledFabricHeight);
+    ctx.strokeRect(fx, fy, sfw, sfh);
 
-    // Motif si disponible (simple texture)
+    /* Motif (hachures légères) */
     if (fabric.pattern) {
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
-      for (let x = fabricX; x < fabricX + scaledFabricWidth; x += 20) {
-        for (let y = fabricY; y < fabricY + scaledFabricHeight; y += 20) {
-          ctx.fillRect(x, y, 10, 10);
-        }
-      }
+      ctx.fillStyle = 'rgba(0,0,0,0.08)';
+      for (let x = fx; x < fx + sfw; x += 16)
+        for (let y = fy; y < fy + sfh; y += 16)
+          ctx.fillRect(x, y, 8, 8);
     }
 
-    // Dessiner le patron si possible
+    /* Patron si ajusté */
     if (canFit) {
-      const scaledPatternWidth = pattern.width * scale;
-      const scaledPatternHeight = pattern.height * scale;
+      let pw = pattern.width * scale;
+      let ph = pattern.height * scale;
 
-      // Positionner le patron au centre du tissu
-      let patternX = fabricX + (scaledFabricWidth - scaledPatternWidth) / 2;
-      let patternY = fabricY + (scaledFabricHeight - scaledPatternHeight) / 2;
-
-      // Vérifier quelle orientation utiliser
-      let patternW = scaledPatternWidth;
-      let patternH = scaledPatternHeight;
-
-      if (rotations.horizontal && !rotations.vertical) {
-        // Horizontal uniquement
-      } else if (rotations.vertical && !rotations.horizontal) {
-        // Vertical uniquement - rotation de 90°
-        patternW = scaledPatternHeight;
-        patternH = scaledPatternWidth;
-        patternX = fabricX + (scaledFabricWidth - patternW) / 2;
-        patternY = fabricY + (scaledFabricHeight - patternH) / 2;
+      if (rotations.vertical && !rotations.horizontal) {
+        [pw, ph] = [ph, pw];
       }
 
-      // Patron avec couleur semi-transparente
-      ctx.fillStyle = '#a78bfa';
-      ctx.globalAlpha = 0.6;
-      ctx.fillRect(patternX, patternY, patternW, patternH);
+      const px = fx + (sfw - pw) / 2;
+      const py = fy + (sfh - ph) / 2;
+
+      ctx.fillStyle = 'rgba(196,136,154,0.45)';
+      ctx.globalAlpha = 0.8;
+      ctx.fillRect(px, py, pw, ph);
       ctx.globalAlpha = 1;
 
-      // Bordure du patron
-      ctx.strokeStyle = '#7c3aed';
+      ctx.strokeStyle = '#7A4F5C';
       ctx.lineWidth = 2;
-      ctx.setLineDash([5, 5]);
-      ctx.strokeRect(patternX, patternY, patternW, patternH);
+      ctx.setLineDash([6, 4]);
+      ctx.strokeRect(px, py, pw, ph);
       ctx.setLineDash([]);
     }
 
-    // Labels
-    ctx.fillStyle = '#333333';
-    ctx.font = 'bold 12px Arial';
+    /* Labels */
+    ctx.fillStyle = '#3D2418';
+    ctx.font = 'bold 12px Georgia, serif';
     ctx.textAlign = 'center';
-
-    // Label tissu
     ctx.fillText(
-      `Tissu: ${fabric.width.toFixed(0)} × ${fabric.height.toFixed(0)} cm`,
-      canvasWidth / 2,
-      canvasHeight - 10
+      `Tissu : ${fabricW.toFixed(0)} cm × ${fabricH.toFixed(0)} cm`,
+      CW / 2, CH - 8
     );
 
-    // Label patron si ajusté
-    if (canFit && rotations) {
-      ctx.font = '11px Arial';
-      ctx.fillStyle = '#7c3aed';
-      const orientations = [];
-      if (rotations.horizontal) orientations.push('H');
-      if (rotations.vertical) orientations.push('V');
+    if (canFit) {
+      ctx.font = '11px Georgia, serif';
+      ctx.fillStyle = '#7A4F5C';
+      const ori = [rotations.horizontal && 'sans rotation', rotations.vertical && '90°'].filter(Boolean).join(' / ');
       ctx.fillText(
-        `Patron (${orientations.join('/')}): ${pattern.width.toFixed(0)} × ${pattern.height.toFixed(0)} cm`,
-        canvasWidth / 2,
-        20
+        `Patron ${pattern.width.toFixed(0)} × ${pattern.height.toFixed(0)} cm — ${ori}`,
+        CW / 2, 18
       );
     }
   }, [fabric, pattern, canFit, rotations]);
 
   return (
-    <div className="bg-gray-50 p-6 rounded-lg">
-      <h4 className="font-bold text-lg mb-4">Visualisation 2D</h4>
-      <div className="flex justify-center">
-        <canvas
-          ref={canvasRef}
-          width={500}
-          height={500}
-          className="border-2 border-gray-300 rounded-lg bg-white shadow-md"
-        />
+    <div style={{ backgroundColor: 'var(--linen)', border: '1.5px solid var(--mauve-pale)', borderRadius: '8px', padding: '20px' }}>
+      <h4 style={{ fontFamily: 'Georgia, serif', fontWeight: 'bold', color: 'var(--brun)', margin: '0 0 16px' }}>
+        Visualisation 2D
+      </h4>
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <canvas ref={canvasRef} width={500} height={500}
+          style={{ border: '2px solid var(--mauve-light)', borderRadius: '8px', backgroundColor: 'var(--creme)', boxShadow: '0 2px 8px rgba(122,79,92,.1)' }} />
       </div>
-      <p className="text-sm text-gray-600 mt-4 text-center">
-        {canFit ? (
-          <span className="text-green-700">
-            ✅ Le patron peut être placé sur le tissu
-          </span>
-        ) : canFit === false ? (
-          <span className="text-red-700">
-            ❌ Le patron est trop grand pour ce tissu
-          </span>
-        ) : (
-          <span className="text-gray-500">
-            Sélectionnez un tissu et un patron pour voir la visualisation
-          </span>
-        )}
+      <p style={{ textAlign: 'center', marginTop: '12px', fontSize: '0.85rem', fontStyle: 'italic', fontFamily: 'Georgia, serif',
+        color: canFit ? '#2E7A46' : canFit === false ? '#943030' : 'var(--brun-mid)' }}>
+        {canFit
+          ? '✅ Le patron peut être placé sur ce tissu'
+          : canFit === false
+          ? '❌ Le patron est trop grand pour ce tissu'
+          : 'Sélectionnez un tissu et un patron pour voir la visualisation'}
       </p>
     </div>
   );
