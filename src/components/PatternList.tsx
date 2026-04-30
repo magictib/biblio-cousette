@@ -8,14 +8,14 @@ interface PatternListProps {
   onDelete: (id: string) => void;
 }
 
-const difficultyStyle: Record<string, { bg: string; color: string; border: string }> = {
+const diffStyle: Record<string, { bg: string; color: string; border: string }> = {
   facile:    { bg: '#E8F5EC', color: '#2E7A46', border: '#80C894' },
   moyen:     { bg: '#FAF3E0', color: '#8A6A10', border: '#D4B86A' },
   difficile: { bg: '#FAE8E8', color: '#943030', border: '#D48080' },
 };
 
 export default function PatternList({ patterns, onDelete }: PatternListProps) {
-  const [previewPattern, setPreviewPattern] = useState<Pattern | null>(null);
+  const [preview, setPreview] = useState<Pattern | null>(null);
 
   if (patterns.length === 0) {
     return (
@@ -28,116 +28,138 @@ export default function PatternList({ patterns, onDelete }: PatternListProps) {
 
   return (
     <>
-    {/* ── Modal visualisateur PDF ───────────────────────────────── */}
-    {previewPattern?.pdfDataUrl && (
-      <div
-        style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(61,36,24,.6)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}
-        onClick={e => { if (e.target === e.currentTarget) setPreviewPattern(null); }}
-      >
-        <div style={{
-          backgroundColor: 'var(--creme)', border: '2px solid var(--mauve-light)', borderRadius: '12px',
-          width: '100%', maxWidth: '900px', maxHeight: '90vh', display: 'flex', flexDirection: 'column',
-          boxShadow: '0 8px 40px rgba(61,36,24,.3)', overflow: 'hidden',
-        }}>
-          <div style={{ padding: '14px 20px', borderBottom: '1.5px solid var(--mauve-pale)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
-            <span style={{ fontFamily: 'Georgia, serif', fontWeight: 'bold', color: 'var(--mauve)', fontSize: '1rem' }}>
-              📄 {previewPattern.name}
-            </span>
-            <button onClick={() => setPreviewPattern(null)}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: 'var(--brun-mid)' }}>✕</button>
-          </div>
-          <div style={{ flex: 1, overflow: 'auto', padding: '16px', minHeight: 0 }}>
-            {previewPattern.pdfDataUrl.startsWith('data:application/pdf') ? (
-              <iframe
-                src={previewPattern.pdfDataUrl}
-                style={{ width: '100%', height: '70vh', border: 'none', borderRadius: '6px' }}
-                title={previewPattern.name}
-              />
-            ) : (
-              <img
-                src={previewPattern.pdfDataUrl}
-                alt={previewPattern.name}
-                style={{ maxWidth: '100%', maxHeight: '70vh', display: 'block', margin: '0 auto', borderRadius: '6px', border: '1.5px solid var(--mauve-pale)' }}
-              />
-            )}
-          </div>
-        </div>
-      </div>
-    )}
-
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {patterns.map((pattern) => {
-        const ds = difficultyStyle[pattern.difficulty] ?? difficultyStyle.moyen;
-
-        return (
-          <div key={pattern.id} className="item-card">
-            <div style={{ padding: '16px' }}>
-
-              {/* En-tête */}
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '10px', gap: '8px' }}>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <h4 style={{ fontFamily: 'Georgia, serif', fontWeight: 'bold', fontSize: '1rem', color: 'var(--brun)', margin: 0, marginBottom: '2px' }}>
-                    {pattern.name}
-                  </h4>
-                  {/* Créatrice */}
-                  {pattern.designer && (
-                    <p style={{ color: 'var(--mauve)', fontSize: '0.8rem', margin: 0, fontStyle: 'italic' }}>
-                      ✦ {pattern.designer}
-                    </p>
-                  )}
-                  <p style={{ color: 'var(--brun-mid)', fontSize: '0.78rem', margin: 0, marginTop: '2px', textTransform: 'capitalize' }}>
-                    {pattern.clothingType}
-                  </p>
-                </div>
-
-                {/* Badge difficulté */}
-                <span style={{
-                  flexShrink: 0, padding: '3px 10px', borderRadius: '10px', fontSize: '0.72rem', fontWeight: 'bold',
-                  backgroundColor: ds.bg, color: ds.color, border: `1px solid ${ds.border}`,
-                  fontFamily: 'Georgia, serif',
-                }}>
-                  {pattern.difficulty}
-                </span>
-              </div>
-
-              {/* Dimensions */}
-              {(pattern.width > 0 || pattern.height > 0) && (
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '10px' }}>
-                  <span style={{ color: 'var(--brun-mid)' }}>Dimensions</span>
-                  <span style={{ color: 'var(--brun)', fontWeight: 600 }}>
-                    {pattern.width.toFixed(0)} × {pattern.height.toFixed(0)} cm
-                  </span>
-                </div>
+      {/* ── Modal visualisateur ───────────────────────────────── */}
+      {preview?.pdfDataUrl && (
+        <div
+          style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(61,36,24,.6)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}
+          onClick={e => { if (e.target === e.currentTarget) setPreview(null); }}
+        >
+          <div style={{
+            backgroundColor: 'var(--creme)', border: '2px solid var(--mauve-light)', borderRadius: '12px',
+            width: '100%', maxWidth: '900px', maxHeight: '90vh', display: 'flex', flexDirection: 'column',
+            boxShadow: '0 8px 40px rgba(61,36,24,.3)', overflow: 'hidden',
+          }}>
+            <div style={{ padding: '14px 20px', borderBottom: '1.5px solid var(--mauve-pale)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+              <span style={{ fontFamily: 'Georgia, serif', fontWeight: 'bold', color: 'var(--mauve)', fontSize: '1rem' }}>
+                📄 {preview.name}
+              </span>
+              <button onClick={() => setPreview(null)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: 'var(--brun-mid)' }}>✕</button>
+            </div>
+            <div style={{ flex: 1, overflow: 'auto', padding: '16px', minHeight: 0 }}>
+              {preview.pdfDataUrl.startsWith('data:application/pdf') ? (
+                <iframe src={preview.pdfDataUrl} style={{ width: '100%', height: '70vh', border: 'none', borderRadius: '6px' }} title={preview.name} />
+              ) : (
+                <img src={preview.pdfDataUrl} alt={preview.name}
+                  style={{ maxWidth: '100%', maxHeight: '70vh', display: 'block', margin: '0 auto', borderRadius: '6px', border: '1.5px solid var(--mauve-pale)' }} />
               )}
-
-              {/* Notes */}
-              {pattern.notes && (
-                <div style={{ backgroundColor: 'var(--linen)', border: '1px solid var(--mauve-pale)', borderRadius: '5px', padding: '7px 10px', fontSize: '0.78rem', color: 'var(--brun-mid)', fontStyle: 'italic', marginBottom: '10px' }}>
-                  {pattern.notes}
-                </div>
-              )}
-
-              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                {pattern.pdfDataUrl && (
-                  <button
-                    onClick={() => setPreviewPattern(pattern)}
-                    style={{
-                      padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem',
-                      border: '1.5px solid var(--mauve-light)', backgroundColor: 'var(--mauve-pale)',
-                      color: 'var(--mauve)', fontFamily: 'Georgia, serif',
-                    }}>
-                    📄 Voir le patron
-                  </button>
-                )}
-                <button className="btn-danger" onClick={() => onDelete(pattern.id)}>
-                  🗑 Supprimer
-                </button>
-              </div>
             </div>
           </div>
-        );
-      })}
-    </div>
+        </div>
+      )}
+
+      {/* ── Tableau ───────────────────────────────────────────── */}
+      <div style={{ overflowX: 'auto' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'Georgia, serif', fontSize: '0.85rem' }}>
+          <thead>
+            <tr style={{ borderBottom: '2px solid var(--mauve-light)' }}>
+              {['Nom', 'Créatrice', 'Type', 'Difficulté', 'Dimensions', '', ''].map((h, i) => (
+                <th key={i} style={{
+                  padding: '8px 12px', textAlign: 'left', fontSize: '0.68rem',
+                  textTransform: 'uppercase', letterSpacing: '0.08em',
+                  color: 'var(--brun-mid)', fontWeight: 'normal',
+                  whiteSpace: 'nowrap',
+                }}>
+                  {h}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {patterns.map((p, idx) => {
+              const ds = diffStyle[p.difficulty] ?? diffStyle.moyen;
+              return (
+                <tr key={p.id} style={{ backgroundColor: idx % 2 === 0 ? 'transparent' : 'rgba(200,180,190,.07)', borderBottom: '1px solid var(--mauve-pale)' }}>
+
+                  {/* Nom */}
+                  <td style={{ padding: '10px 12px', color: 'var(--brun)', fontWeight: 'bold', maxWidth: '200px' }}>
+                    <span style={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {p.name}
+                    </span>
+                  </td>
+
+                  {/* Créatrice */}
+                  <td style={{ padding: '10px 12px', color: 'var(--mauve)', fontStyle: 'italic', maxWidth: '140px' }}>
+                    <span style={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {p.designer ?? '—'}
+                    </span>
+                  </td>
+
+                  {/* Type */}
+                  <td style={{ padding: '10px 12px', color: 'var(--brun-mid)', textTransform: 'capitalize', whiteSpace: 'nowrap' }}>
+                    {p.clothingType}
+                  </td>
+
+                  {/* Difficulté */}
+                  <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>
+                    <span style={{
+                      padding: '2px 8px', borderRadius: '8px', fontSize: '0.72rem', fontWeight: 'bold',
+                      backgroundColor: ds.bg, color: ds.color, border: `1px solid ${ds.border}`,
+                    }}>
+                      {p.difficulty}
+                    </span>
+                  </td>
+
+                  {/* Dimensions */}
+                  <td style={{ padding: '10px 12px', color: 'var(--brun-mid)', whiteSpace: 'nowrap', fontSize: '0.82rem' }}>
+                    {p.width > 0 || p.height > 0 ? `${p.width.toFixed(0)} × ${p.height.toFixed(0)} cm` : '—'}
+                  </td>
+
+                  {/* Icône voir patron */}
+                  <td style={{ padding: '10px 8px', textAlign: 'center', width: '36px' }}>
+                    {p.pdfDataUrl ? (
+                      <button
+                        onClick={() => setPreview(p)}
+                        title="Voir le patron"
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', borderRadius: '5px', lineHeight: 1 }}
+                        onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--mauve-pale)')}
+                        onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
+                      >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--mauve)" strokeWidth="2" strokeLinecap="round">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                          <polyline points="14 2 14 8 20 8"/>
+                          <line x1="9" y1="13" x2="15" y2="13"/>
+                          <line x1="9" y1="17" x2="13" y2="17"/>
+                        </svg>
+                      </button>
+                    ) : (
+                      <span style={{ color: 'var(--mauve-pale)', fontSize: '0.7rem' }}>—</span>
+                    )}
+                  </td>
+
+                  {/* Icône supprimer */}
+                  <td style={{ padding: '10px 8px', textAlign: 'center', width: '36px' }}>
+                    <button
+                      onClick={() => onDelete(p.id)}
+                      title="Supprimer"
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', borderRadius: '5px', lineHeight: 1 }}
+                      onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#FAE8E8')}
+                      onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#943030" strokeWidth="2" strokeLinecap="round">
+                        <polyline points="3 6 5 6 21 6"/>
+                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                        <path d="M10 11v6M14 11v6"/>
+                        <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                      </svg>
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </>
   );
 }

@@ -57,14 +57,23 @@ export default function CatalogBrowser({ onSelect, onAddPattern, onClose }: Cata
     }, req?.meters);
   };
 
-  const handlePdfImport = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const readAsDataUrl = (file: File): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload  = e => resolve(e.target!.result as string);
+      reader.onerror = () => reject(new Error(`Impossible de lire "${file.name}".`));
+      reader.readAsDataURL(file);
+    });
+
+  const handlePdfImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    if (files.length === 0) return;
 
     const MAX_MB = 8;
-    if (file.size > MAX_MB * 1024 * 1024) {
+    const tooBig = files.filter(f => f.size > MAX_MB * 1024 * 1024);
+    if (tooBig.length > 0) {
       setPdfStatus('error');
-      setPdfError(`Fichier trop volumineux (${(file.size / 1024 / 1024).toFixed(1)} Mo). Maximum ${MAX_MB} Mo.`);
+      setPdfError(`${tooBig.map(f => `"${f.name}" (${(f.size / 1024 / 1024).toFixed(1)} Mo)`).join(', ')} dépasse ${MAX_MB} Mo.`);
       e.target.value = '';
       return;
     }
@@ -73,33 +82,37 @@ export default function CatalogBrowser({ onSelect, onAddPattern, onClose }: Cata
     setPdfError('');
     setPdfSaved('');
 
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const dataUrl = ev.target!.result as string;
-      const nameWithoutExt = file.name.replace(/\.[^.]+$/, '');
-      const pattern: Omit<Pattern, 'id'> = {
-        name:         nameWithoutExt,
-        designer:     undefined,
-        clothingType: 'autres',
-        difficulty:   'moyen',
-        width:        0,
-        height:       0,
-        pdfDataUrl:   dataUrl,
-      };
-      if (onAddPattern) {
-        onAddPattern(pattern);
-        setPdfStatus('done');
-        setPdfSaved(nameWithoutExt);
-      } else {
-        onSelect(pattern);
-        setPdfStatus('done');
+    try {
+      const validFiles = files.filter(f => f.size <= MAX_MB * 1024 * 1024);
+      for (const file of validFiles) {
+        const dataUrl = await readAsDataUrl(file);
+        const nameWithoutExt = file.name.replace(/\.[^.]+$/, '');
+        const pattern: Omit<Pattern, 'id'> = {
+          name:         nameWithoutExt,
+          designer:     undefined,
+          clothingType: 'autres',
+          difficulty:   'moyen',
+          width:        0,
+          height:       0,
+          pdfDataUrl:   dataUrl,
+        };
+        if (onAddPattern) {
+          onAddPattern(pattern);
+        } else {
+          onSelect(pattern);
+        }
       }
-    };
-    reader.onerror = () => {
+      setPdfStatus('done');
+      setPdfSaved(
+        validFiles.length === 1
+          ? validFiles[0].name.replace(/\.[^.]+$/, '')
+          : `${validFiles.length} patrons`
+      );
+    } catch (err) {
       setPdfStatus('error');
-      setPdfError('Impossible de lire le fichier.');
-    };
-    reader.readAsDataURL(file);
+      setPdfError(String(err).replace('Error: ', ''));
+    }
+
     e.target.value = '';
   };
 
@@ -128,7 +141,7 @@ export default function CatalogBrowser({ onSelect, onAddPattern, onClose }: Cata
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               {/* Bouton import PDF */}
               <div style={{ position: 'relative' }}>
-                <input ref={pdfRef} type="file" accept="image/*,application/pdf"
+                <input ref={pdfRef} type="file" accept="image/*,application/pdf" multiple
                   onChange={handlePdfImport} style={{ display: 'none' }} />
                 <button
                   type="button"
@@ -144,7 +157,7 @@ export default function CatalogBrowser({ onSelect, onAddPattern, onClose }: Cata
                     opacity: pdfStatus === 'loading' ? 0.7 : 1,
                     whiteSpace: 'nowrap',
                   }}>
-                  {pdfStatus === 'loading' ? '⏳ Lecture…' : '📎 Ajouter un patron (PDF / image)'}
+                  {pdfStatus === 'loading' ? '⏳ Lecture…' : '📎 Ajouter mes patrons (PDF / image)'}
                 </button>
               </div>
               <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: 'var(--brun-mid)', lineHeight: 1 }}>✕</button>
