@@ -3,11 +3,12 @@
 import { Fabric } from '@/types';
 
 interface FabricListProps {
-  fabrics: Fabric[];
+  fabrics:  Fabric[];
   onDelete: (id: string) => void;
+  onEdit:   (fabric: Fabric) => void;
 }
 
-export default function FabricList({ fabrics, onDelete }: FabricListProps) {
+export default function FabricList({ fabrics, onDelete, onEdit }: FabricListProps) {
   if (fabrics.length === 0) {
     return (
       <div style={{ textAlign: 'center', padding: '48px 24px', color: 'var(--brun-mid)', fontStyle: 'italic', fontFamily: 'Georgia, serif' }}>
@@ -151,9 +152,16 @@ export default function FabricList({ fabrics, onDelete }: FabricListProps) {
                 </div>
               )}
 
-              <button className="btn-danger" onClick={() => onDelete(fabric.id)}>
-                🗑 Supprimer
-              </button>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button onClick={() => onEdit(fabric)}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '6px 12px', borderRadius: '6px', border: '1.5px solid var(--mauve-light)', backgroundColor: 'var(--mauve-pale)', color: 'var(--mauve)', cursor: 'pointer', fontFamily: 'Georgia, serif', fontSize: '0.8rem' }}>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  Modifier
+                </button>
+                <button className="btn-danger" onClick={() => onDelete(fabric.id)}>
+                  🗑 Supprimer
+                </button>
+              </div>
             </div>
           </div>
         );

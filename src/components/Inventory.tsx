@@ -9,12 +9,13 @@ import FabricList from './FabricList';
 import PatternList from './PatternList';
 
 export default function Inventory() {
-  const [fabrics,     setFabrics]     = useState<Fabric[]>([]);
-  const [patterns,    setPatterns]    = useState<Pattern[]>([]);
-  const [activeTab,   setActiveTab]   = useState<'fabrics' | 'patterns'>('fabrics');
-  const [showForm,    setShowForm]    = useState(false);
+  const [fabrics,        setFabrics]        = useState<Fabric[]>([]);
+  const [patterns,       setPatterns]       = useState<Pattern[]>([]);
+  const [activeTab,      setActiveTab]      = useState<'fabrics' | 'patterns'>('fabrics');
+  const [showForm,       setShowForm]       = useState(false);
+  const [editingFabric,  setEditingFabric]  = useState<Fabric  | null>(null);
+  const [editingPattern, setEditingPattern] = useState<Pattern | null>(null);
 
-  /* Chargement avec migration automatique de l'ancien format */
   useEffect(() => {
     setFabrics(loadFabrics());
     setPatterns(loadPatterns());
@@ -23,15 +24,79 @@ export default function Inventory() {
   useEffect(() => { localStorage.setItem('fabrics',  JSON.stringify(fabrics));  }, [fabrics]);
   useEffect(() => { localStorage.setItem('patterns', JSON.stringify(patterns)); }, [patterns]);
 
-  const addFabric    = (f: Omit<Fabric, 'id'>)  => setFabrics([...fabrics,   { ...f,  id: Date.now().toString() }]);
-  const deleteFabric = (id: string)              => setFabrics(fabrics.filter(f => f.id !== id));
-  const addPattern   = (p: Omit<Pattern, 'id'>) => setPatterns([...patterns,  { ...p,  id: Date.now().toString() }]);
-  const deletePattern= (id: string)             => setPatterns(patterns.filter(p => p.id !== id));
+  /* ── Tissus ──────────────────────────────────────────────────── */
+  const handleFabricSubmit = (data: Omit<Fabric, 'id'>) => {
+    if (editingFabric) {
+      setFabrics(prev => prev.map(f => f.id === editingFabric.id ? { ...data, id: editingFabric.id } : f));
+      setEditingFabric(null);
+    } else {
+      setFabrics(prev => [...prev, { ...data, id: Date.now().toString() }]);
+    }
+    setShowForm(false);
+  };
+
+  const startEditFabric = (fabric: Fabric) => {
+    setEditingFabric(fabric);
+    setEditingPattern(null);
+    setActiveTab('fabrics');
+    setShowForm(true);
+  };
+
+  const deleteFabric = (id: string) => {
+    setFabrics(prev => prev.filter(f => f.id !== id));
+    if (editingFabric?.id === id) { setEditingFabric(null); setShowForm(false); }
+  };
+
+  /* ── Patrons ─────────────────────────────────────────────────── */
+  const handlePatternSubmit = (data: Omit<Pattern, 'id'>) => {
+    if (editingPattern) {
+      setPatterns(prev => prev.map(p =>
+        p.id === editingPattern.id
+          ? { ...data, id: editingPattern.id, pdfDataUrl: data.pdfDataUrl ?? p.pdfDataUrl }
+          : p
+      ));
+      setEditingPattern(null);
+    } else {
+      setPatterns(prev => [...prev, { ...data, id: Date.now().toString() }]);
+    }
+    setShowForm(false);
+  };
+
+  const startEditPattern = (pattern: Pattern) => {
+    setEditingPattern(pattern);
+    setEditingFabric(null);
+    setActiveTab('patterns');
+    setShowForm(true);
+  };
+
+  const deletePattern = (id: string) => {
+    setPatterns(prev => prev.filter(p => p.id !== id));
+    if (editingPattern?.id === id) { setEditingPattern(null); setShowForm(false); }
+  };
+
+  /* ── Bouton Ajouter : réinitialise l'édition en cours ───────── */
+  const handleToggleAdd = () => {
+    if (showForm && !editingFabric && !editingPattern) {
+      setShowForm(false);
+    } else {
+      setEditingFabric(null);
+      setEditingPattern(null);
+      setShowForm(true);
+    }
+  };
+
+  const cancelForm = () => {
+    setShowForm(false);
+    setEditingFabric(null);
+    setEditingPattern(null);
+  };
+
+  const isEditing = editingFabric !== null || editingPattern !== null;
+  const showAddButton = !isEditing;
 
   return (
     <div style={{ padding: '28px 28px 32px' }}>
 
-      {/* Titre */}
       <div style={{ marginBottom: '24px' }}>
         <h3 style={{ color: 'var(--mauve)', fontFamily: 'Georgia, serif', fontSize: '1.4rem', fontWeight: 'bold', margin: '0 0 4px' }}>
           Inventaire
@@ -41,32 +106,26 @@ export default function Inventory() {
         </p>
       </div>
 
-      {/* ── Onglets étiquettes ─────────────────────────────────────── */}
+      {/* ── Onglets ───────────────────────────────────────────────── */}
       <div style={{ borderBottom: '2px solid var(--mauve-light)', marginBottom: '24px', display: 'flex', gap: '6px', alignItems: 'flex-end' }}>
-        <button
-          onClick={() => setActiveTab('fabrics')}
-          className={`swatch-tab${activeTab === 'fabrics' ? ' active' : ''}`}
-        >
-          🧵 Tissus
-          <span style={{ marginLeft: '6px', fontSize: '0.75rem', opacity: 0.7 }}>({fabrics.length})</span>
+        <button onClick={() => { setActiveTab('fabrics');  cancelForm(); }} className={`swatch-tab${activeTab === 'fabrics'  ? ' active' : ''}`}>
+          🧵 Tissus<span style={{ marginLeft: '6px', fontSize: '0.75rem', opacity: 0.7 }}>({fabrics.length})</span>
         </button>
-        <button
-          onClick={() => setActiveTab('patterns')}
-          className={`swatch-tab${activeTab === 'patterns' ? ' active' : ''}`}
-        >
-          📋 Patrons
-          <span style={{ marginLeft: '6px', fontSize: '0.75rem', opacity: 0.7 }}>({patterns.length})</span>
+        <button onClick={() => { setActiveTab('patterns'); cancelForm(); }} className={`swatch-tab${activeTab === 'patterns' ? ' active' : ''}`}>
+          📋 Patrons<span style={{ marginLeft: '6px', fontSize: '0.75rem', opacity: 0.7 }}>({patterns.length})</span>
         </button>
       </div>
 
-      {/* Bouton ajouter */}
-      <div style={{ marginBottom: '24px' }}>
-        <button onClick={() => setShowForm(v => !v)} className={showForm ? 'btn-couture' : 'btn-sage'}>
-          {showForm ? '✖ Annuler' : '＋ Ajouter'}
-        </button>
-      </div>
+      {/* ── Bouton Ajouter ────────────────────────────────────────── */}
+      {showAddButton && (
+        <div style={{ marginBottom: '24px' }}>
+          <button onClick={handleToggleAdd} className={showForm ? 'btn-couture' : 'btn-sage'}>
+            {showForm ? '✖ Annuler' : '＋ Ajouter'}
+          </button>
+        </div>
+      )}
 
-      {/* Formulaire */}
+      {/* ── Formulaire (ajout ou édition) ─────────────────────────── */}
       {showForm && (
         <div style={{
           backgroundColor: 'var(--linen)', border: '1.5px solid var(--mauve-pale)',
@@ -74,17 +133,27 @@ export default function Inventory() {
         }}>
           <div style={{ position: 'absolute', inset: '5px', border: '1px dashed var(--mauve-pale)', borderRadius: '5px', pointerEvents: 'none', opacity: 0.5 }}/>
           {activeTab === 'fabrics' ? (
-            <FabricForm  onSubmit={f => { addFabric(f);  setShowForm(false); }} />
+            <FabricForm
+              key={editingFabric?.id ?? 'new-fabric'}
+              initialValues={editingFabric ?? undefined}
+              onSubmit={handleFabricSubmit}
+              onCancel={cancelForm}
+            />
           ) : (
-            <PatternForm onSubmit={p => { addPattern(p); setShowForm(false); }} />
+            <PatternForm
+              key={editingPattern?.id ?? 'new-pattern'}
+              initialValues={editingPattern ?? undefined}
+              onSubmit={handlePatternSubmit}
+              onCancel={cancelForm}
+            />
           )}
         </div>
       )}
 
-      {/* Liste */}
+      {/* ── Listes ────────────────────────────────────────────────── */}
       {activeTab === 'fabrics'
-        ? <FabricList  fabrics={fabrics}   onDelete={deleteFabric}  />
-        : <PatternList patterns={patterns} onDelete={deletePattern} />
+        ? <FabricList  fabrics={fabrics}   onDelete={deleteFabric}  onEdit={startEditFabric}  />
+        : <PatternList patterns={patterns} onDelete={deletePattern} onEdit={startEditPattern} />
       }
     </div>
   );

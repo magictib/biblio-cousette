@@ -6,6 +6,7 @@ import { Pattern } from '@/types';
 interface PatternListProps {
   patterns: Pattern[];
   onDelete: (id: string) => void;
+  onEdit:   (pattern: Pattern) => void;
 }
 
 const diffStyle: Record<string, { bg: string; color: string; border: string }> = {
@@ -14,7 +15,7 @@ const diffStyle: Record<string, { bg: string; color: string; border: string }> =
   difficile: { bg: '#FAE8E8', color: '#943030', border: '#D48080' },
 };
 
-export default function PatternList({ patterns, onDelete }: PatternListProps) {
+export default function PatternList({ patterns, onDelete, onEdit }: PatternListProps) {
   const [preview, setPreview] = useState<Pattern | null>(null);
 
   if (patterns.length === 0) {
@@ -63,7 +64,7 @@ export default function PatternList({ patterns, onDelete }: PatternListProps) {
         <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'Georgia, serif', fontSize: '0.85rem' }}>
           <thead>
             <tr style={{ borderBottom: '2px solid var(--mauve-light)' }}>
-              {['Nom', 'Créatrice', 'Type', 'Difficulté', 'Dimensions', '', ''].map((h, i) => (
+              {['Nom', 'Créatrice', 'Type', 'Difficulté', 'Dimensions', '', '', ''].map((h, i) => (
                 <th key={i} style={{
                   padding: '8px 12px', textAlign: 'left', fontSize: '0.68rem',
                   textTransform: 'uppercase', letterSpacing: '0.08em',
@@ -135,6 +136,22 @@ export default function PatternList({ patterns, onDelete }: PatternListProps) {
                     ) : (
                       <span style={{ color: 'var(--mauve-pale)', fontSize: '0.7rem' }}>—</span>
                     )}
+                  </td>
+
+                  {/* Icône modifier */}
+                  <td style={{ padding: '10px 8px', textAlign: 'center', width: '36px' }}>
+                    <button
+                      onClick={() => onEdit(p)}
+                      title="Modifier"
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', borderRadius: '5px', lineHeight: 1 }}
+                      onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--mauve-pale)')}
+                      onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
+                    >
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--mauve)" strokeWidth="2.2" strokeLinecap="round">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                      </svg>
+                    </button>
                   </td>
 
                   {/* Icône supprimer */}
