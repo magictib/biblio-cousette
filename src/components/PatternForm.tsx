@@ -57,6 +57,7 @@ export default function PatternForm({ onSubmit }: PatternFormProps) {
       {showCatalog && (
         <CatalogBrowser
           onSelect={handleCatalogSelect}
+          onAddPattern={(p) => { onSubmit(p); setShowCatalog(false); }}
           onClose={() => setShowCatalog(false)}
         />
       )}

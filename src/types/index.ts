@@ -21,6 +21,7 @@ export interface Pattern {
   height: number;          // en cm
   difficulty: 'facile' | 'moyen' | 'difficile';
   notes?: string;
+  pdfDataUrl?: string;     // PDF ou image importé(e), stocké(e) en base64
 }
 
 export interface Project {

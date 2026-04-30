@@ -32,7 +32,8 @@ export function migratePattern(raw: any): Pattern {
     width:       Number(raw.width ?? 60),
     height:      Number(raw.height ?? 80),
     difficulty:  (['facile', 'moyen', 'difficile'].includes(raw.difficulty) ? raw.difficulty : 'moyen') as Pattern['difficulty'],
-    notes:       raw.notes ? String(raw.notes) : undefined,
+    notes:       raw.notes      ? String(raw.notes)      : undefined,
+    pdfDataUrl:  raw.pdfDataUrl ? String(raw.pdfDataUrl) : undefined,
   };
 }
 

@@ -3,10 +3,10 @@
 import { useState, useMemo, useRef } from 'react';
 import catalog, { CatalogEntry } from '@/data/patternCatalog';
 import { Pattern } from '@/types';
-import { analyzePattern } from '@/utils/gemini';
 
 interface CatalogBrowserProps {
   onSelect: (pattern: Omit<Pattern, 'id'>, fabricMeters?: number) => void;
+  onAddPattern?: (pattern: Omit<Pattern, 'id'>) => void;
   onClose: () => void;
 }
 
@@ -15,15 +15,16 @@ const DIFFICULTIES = ['toutes', 'facile', 'moyen', 'difficile'] as const;
 
 type PdfStatus = 'idle' | 'loading' | 'done' | 'error';
 
-export default function CatalogBrowser({ onSelect, onClose }: CatalogBrowserProps) {
+export default function CatalogBrowser({ onSelect, onAddPattern, onClose }: CatalogBrowserProps) {
   const [search,     setSearch]     = useState('');
   const [typeFilter, setTypeFilter] = useState('tous');
   const [diffFilter, setDiffFilter] = useState<'toutes' | 'facile' | 'moyen' | 'difficile'>('toutes');
   const [selected,   setSelected]   = useState<CatalogEntry | null>(null);
   const [chosenSize, setChosenSize] = useState('');
 
-  const [pdfStatus, setPdfStatus] = useState<PdfStatus>('idle');
-  const [pdfError,  setPdfError]  = useState('');
+  const [pdfStatus,  setPdfStatus]  = useState<PdfStatus>('idle');
+  const [pdfError,   setPdfError]   = useState('');
+  const [pdfSaved,   setPdfSaved]   = useState('');
   const pdfRef = useRef<HTMLInputElement>(null);
 
   const results = useMemo(() => catalog.filter(p => {
@@ -56,33 +57,47 @@ export default function CatalogBrowser({ onSelect, onClose }: CatalogBrowserProp
     }, req?.meters);
   };
 
-  const handlePdfImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePdfImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const MAX_MB = 8;
+    if (file.size > MAX_MB * 1024 * 1024) {
+      setPdfStatus('error');
+      setPdfError(`Fichier trop volumineux (${(file.size / 1024 / 1024).toFixed(1)} Mo). Maximum ${MAX_MB} Mo.`);
+      e.target.value = '';
+      return;
+    }
+
     setPdfStatus('loading');
     setPdfError('');
+    setPdfSaved('');
 
     const reader = new FileReader();
-    reader.onload = async (ev) => {
+    reader.onload = (ev) => {
       const dataUrl = ev.target!.result as string;
-      try {
-        const data = await analyzePattern(dataUrl, '38');
-        const piecesCount = data.pieces?.length ?? 0;
-        onSelect({
-          name:         `Patron importé (${data.garment_type})`,
-          designer:     '',
-          clothingType: data.garment_type,
-          difficulty:   'moyen',
-          width:        140,
-          height:       100,
-          notes:        `Importé via PDF — ${piecesCount} pièce${piecesCount > 1 ? 's' : ''} identifiée${piecesCount > 1 ? 's' : ''}`,
-        });
+      const nameWithoutExt = file.name.replace(/\.[^.]+$/, '');
+      const pattern: Omit<Pattern, 'id'> = {
+        name:         nameWithoutExt,
+        designer:     undefined,
+        clothingType: 'autres',
+        difficulty:   'moyen',
+        width:        0,
+        height:       0,
+        pdfDataUrl:   dataUrl,
+      };
+      if (onAddPattern) {
+        onAddPattern(pattern);
         setPdfStatus('done');
-      } catch (err) {
-        setPdfStatus('error');
-        setPdfError(String(err).replace('Error: ', ''));
+        setPdfSaved(nameWithoutExt);
+      } else {
+        onSelect(pattern);
+        setPdfStatus('done');
       }
+    };
+    reader.onerror = () => {
+      setPdfStatus('error');
+      setPdfError('Impossible de lire le fichier.');
     };
     reader.readAsDataURL(file);
     e.target.value = '';
@@ -117,7 +132,7 @@ export default function CatalogBrowser({ onSelect, onClose }: CatalogBrowserProp
                   onChange={handlePdfImport} style={{ display: 'none' }} />
                 <button
                   type="button"
-                  onClick={() => { setPdfStatus('idle'); setPdfError(''); pdfRef.current?.click(); }}
+                  onClick={() => { setPdfStatus('idle'); setPdfError(''); setPdfSaved(''); pdfRef.current?.click(); }}
                   disabled={pdfStatus === 'loading'}
                   style={{
                     display: 'flex', alignItems: 'center', gap: '6px',
@@ -129,7 +144,7 @@ export default function CatalogBrowser({ onSelect, onClose }: CatalogBrowserProp
                     opacity: pdfStatus === 'loading' ? 0.7 : 1,
                     whiteSpace: 'nowrap',
                   }}>
-                  {pdfStatus === 'loading' ? '⏳ Analyse…' : '📎 Importer mon patron (PDF)'}
+                  {pdfStatus === 'loading' ? '⏳ Lecture…' : '📎 Ajouter un patron (PDF / image)'}
                 </button>
               </div>
               <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: 'var(--brun-mid)', lineHeight: 1 }}>✕</button>
@@ -142,9 +157,9 @@ export default function CatalogBrowser({ onSelect, onClose }: CatalogBrowserProp
               ⚠️ {pdfError}
             </div>
           )}
-          {pdfStatus === 'done' && (
+          {pdfStatus === 'done' && pdfSaved && (
             <div style={{ backgroundColor: '#E8F5EC', border: '1px solid #80C894', borderRadius: '6px', padding: '8px 12px', marginBottom: '10px', fontSize: '0.8rem', color: '#2E7A46' }}>
-              ✅ Patron analysé et importé dans le formulaire — vérifiez les informations.
+              ✅ «{pdfSaved}» ajouté à votre collection de patrons.
             </div>
           )}
 
