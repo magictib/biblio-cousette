@@ -76,20 +76,31 @@ export async function POST(request: NextRequest) {
         ...(isPdf ? { 'anthropic-beta': 'pdfs-2024-09-25' } : {}),
       },
       body: JSON.stringify({
-        model: 'claude-opus-4-7',
-        max_tokens: 2048,
+        model: 'claude-sonnet-4-6',
+        max_tokens: 4096,
         messages: [{ role: 'user', content: [imageContent, { type: 'text', text: prompt }] }],
       }),
     });
 
-    const data = await res.json() as { content?: { text: string }[] };
-    const text = data.content?.[0]?.text ?? '';
+    const data = await res.json() as {
+      content?: { type: string; text: string }[];
+      error?: { type: string; message: string };
+      type?: string;
+    };
+
+    /* L'API a retourné une erreur HTTP */
+    if (!res.ok || data.error) {
+      const msg = data.error?.message ?? `HTTP ${res.status}`;
+      return NextResponse.json({ error: `Erreur API Anthropic : ${msg}` }, { status: 502 });
+    }
+
+    const text = data.content?.find(c => c.type === 'text')?.text ?? '';
 
     /* Essaie d'extraire le JSON même si Claude ajoute du texte autour */
     const jsonMatch = text.match(/\{[\s\S]*\}/) ?? text.match(/\[[\s\S]*\]/);
     if (!jsonMatch) {
-      const preview = text.slice(0, 300);
-      return NextResponse.json({ error: `Réponse IA non analysable : ${preview}`, raw: text }, { status: 502 });
+      const preview = text.slice(0, 400) || '(réponse vide)';
+      return NextResponse.json({ error: `Réponse IA non analysable : ${preview}` }, { status: 502 });
     }
 
     const parsed = JSON.parse(jsonMatch[0]) as {
