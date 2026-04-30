@@ -5,15 +5,16 @@ import Inventory from '@/components/Inventory';
 import PatternFitter from '@/components/PatternFitter';
 import ProjectGallery from '@/components/ProjectGallery';
 import LayPlanTool from '@/components/LayPlanTool';
-import ApiKeySetup from '@/components/ApiKeySetup';
+import CreationShare from '@/components/CreationShare';
 
-type Tab = 'inventory' | 'fitter' | 'projects' | 'layplan';
+type Tab = 'inventory' | 'fitter' | 'projects' | 'layplan' | 'partage';
 
 const navItems: { id: Tab; label: string; sublabel: string; mobileLabel: string }[] = [
-  { id: 'inventory', label: 'Inventaire',  sublabel: 'Tissus & Patrons',   mobileLabel: 'Inventaire' },
-  { id: 'fitter',    label: 'Testeur',     sublabel: 'Patron sur tissu',   mobileLabel: 'Testeur'    },
-  { id: 'layplan',   label: 'Placement',   sublabel: 'Découpe & disposition', mobileLabel: 'Placement' },
-  { id: 'projects',  label: 'Projets',     sublabel: 'Ma galerie',         mobileLabel: 'Projets'    },
+  { id: 'inventory', label: 'Inventaire',  sublabel: 'Tissus & Patrons',      mobileLabel: 'Inventaire' },
+  { id: 'fitter',    label: 'Testeur',     sublabel: 'Patron sur tissu',      mobileLabel: 'Testeur'    },
+  { id: 'layplan',   label: 'Placement',   sublabel: 'Découpe & disposition', mobileLabel: 'Placement'  },
+  { id: 'projects',  label: 'Projets',     sublabel: 'Ma galerie',            mobileLabel: 'Projets'    },
+  { id: 'partage',   label: 'Partage',     sublabel: 'Mes créations',         mobileLabel: 'Partage'    },
 ];
 
 function SewingButton({ active }: { active: boolean }) {
@@ -61,6 +62,13 @@ function NavIcon({ id, active }: { id: Tab; active: boolean }) {
       <rect x="3" y="17" width="8" height="4" rx="1"/>
     </svg>
   );
+  if (id === 'partage') return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={col} strokeWidth="2" strokeLinecap="round">
+      <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+    </svg>
+  );
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={col} strokeWidth="2" strokeLinecap="round">
       <rect x="3" y="3" width="7" height="7" rx="1"/>
@@ -76,7 +84,6 @@ export default function Home() {
 
   return (
     <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '32px 20px' }}>
-      <ApiKeySetup />
 
       {/* ── Navigation mobile ─────────────────────────────────────── */}
       <nav className="md:hidden" style={{ marginBottom: '20px' }}>
@@ -164,6 +171,7 @@ export default function Home() {
             {activeTab === 'fitter'    && <PatternFitter />}
             {activeTab === 'layplan'   && <LayPlanTool />}
             {activeTab === 'projects'  && <ProjectGallery />}
+            {activeTab === 'partage'   && <CreationShare />}
           </div>
         </main>
       </div>

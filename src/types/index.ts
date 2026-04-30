@@ -35,6 +35,22 @@ export interface Project {
   createdAt: string;
 }
 
+export interface Creation {
+  id: string;
+  name: string;
+  status: 'en_cours' | 'termine';
+  photos: string[];
+  fabricName?: string;
+  fabricId?: string;
+  patternName?: string;
+  patternId?: string;
+  tips?: string;
+  difficulties?: string;
+  notes?: string;
+  startedAt: string;
+  finishedAt?: string;
+}
+
 export interface FittingResult {
   canFit: boolean;
   rotations: {
