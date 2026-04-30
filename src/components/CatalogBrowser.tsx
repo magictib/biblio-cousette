@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import catalog, { CatalogEntry } from '@/data/patternCatalog';
 import { Pattern } from '@/types';
 
@@ -9,8 +9,10 @@ interface CatalogBrowserProps {
   onClose: () => void;
 }
 
-const TYPES = ['tous', 'blouse', 't-shirt', 'pull', 'robe', 'jupe', 'pantalon', 'veste', 'manteau', 'combinaison', 'accessoire'];
+const TYPES = ['tous', 'blouse', 't-shirt', 'pull', 'robe', 'jupe', 'pantalon', 'veste', 'manteau', 'combinaison', 'sweat', 'chemise', 'accessoire'];
 const DIFFICULTIES = ['toutes', 'facile', 'moyen', 'difficile'] as const;
+
+type PdfStatus = 'idle' | 'loading' | 'done' | 'error';
 
 export default function CatalogBrowser({ onSelect, onClose }: CatalogBrowserProps) {
   const [search,     setSearch]     = useState('');
@@ -18,6 +20,10 @@ export default function CatalogBrowser({ onSelect, onClose }: CatalogBrowserProp
   const [diffFilter, setDiffFilter] = useState<'toutes' | 'facile' | 'moyen' | 'difficile'>('toutes');
   const [selected,   setSelected]   = useState<CatalogEntry | null>(null);
   const [chosenSize, setChosenSize] = useState('');
+
+  const [pdfStatus, setPdfStatus] = useState<PdfStatus>('idle');
+  const [pdfError,  setPdfError]  = useState('');
+  const pdfRef = useRef<HTMLInputElement>(null);
 
   const results = useMemo(() => catalog.filter(p => {
     const q = search.toLowerCase();
@@ -39,18 +45,67 @@ export default function CatalogBrowser({ onSelect, onClose }: CatalogBrowserProp
     const req  = selected.fabricReqs.find(r => r.size === size) ?? selected.fabricReqs[0];
 
     onSelect({
-      name:        selected.name,
-      designer:    selected.designer,
-      clothingType:selected.clothingType,
-      difficulty:  selected.difficulty,
-      width:       req ? req.widthCm : 140,
-      height:      100, // hauteur par défaut — à ajuster
-      notes:       selected.description,
+      name:         selected.name,
+      designer:     selected.designer,
+      clothingType: selected.clothingType,
+      difficulty:   selected.difficulty,
+      width:        req ? req.widthCm : 140,
+      height:       100,
+      notes:        selected.description,
     }, req?.meters);
   };
 
+  const handlePdfImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setPdfStatus('loading');
+    setPdfError('');
+
+    const reader = new FileReader();
+    reader.onload = async (ev) => {
+      const dataUrl = ev.target!.result as string;
+      try {
+        const res  = await fetch('/api/analyze-pattern', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ fileDataUrl: dataUrl, size: '38' }),
+        });
+        const data = await res.json() as {
+          pieces?: unknown[];
+          garment_type?: string;
+          error?: string;
+        };
+
+        if (data.error) {
+          setPdfStatus('error');
+          setPdfError(data.error);
+          return;
+        }
+
+        const garmentType = data.garment_type ?? 'autres';
+        const piecesCount = data.pieces?.length ?? 0;
+
+        onSelect({
+          name:         `Patron importé (${garmentType})`,
+          designer:     '',
+          clothingType: garmentType,
+          difficulty:   'moyen',
+          width:        140,
+          height:       100,
+          notes:        `Importé via PDF — ${piecesCount} pièce${piecesCount > 1 ? 's' : ''} identifiée${piecesCount > 1 ? 's' : ''}`,
+        });
+        setPdfStatus('done');
+      } catch {
+        setPdfStatus('error');
+        setPdfError('Erreur réseau lors de l\'analyse.');
+      }
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
   return (
-    /* Overlay */
     <div style={{
       position: 'fixed', inset: 0, backgroundColor: 'rgba(61,36,24,.45)',
       zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -64,20 +119,54 @@ export default function CatalogBrowser({ onSelect, onClose }: CatalogBrowserProp
         boxShadow: '0 8px 40px rgba(61,36,24,.25)', position: 'relative',
         overflow: 'hidden',
       }}>
-        {/* Surpiqûre décorative */}
         <div style={{ position: 'absolute', inset: '6px', border: '1.5px dashed var(--mauve-pale)', borderRadius: '8px', pointerEvents: 'none', opacity: 0.35, zIndex: 0 }}/>
 
         {/* En-tête */}
         <div style={{ padding: '20px 24px 16px', borderBottom: '1.5px solid var(--mauve-pale)', flexShrink: 0, position: 'relative', zIndex: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
             <h3 style={{ fontFamily: 'Georgia, serif', color: 'var(--mauve)', fontSize: '1.2rem', fontWeight: 'bold', margin: 0 }}>
               📚 Catalogue de patrons
             </h3>
-            <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: 'var(--brun-mid)', lineHeight: 1 }}>✕</button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              {/* Bouton import PDF */}
+              <div style={{ position: 'relative' }}>
+                <input ref={pdfRef} type="file" accept="image/*,application/pdf"
+                  onChange={handlePdfImport} style={{ display: 'none' }} />
+                <button
+                  type="button"
+                  onClick={() => { setPdfStatus('idle'); setPdfError(''); pdfRef.current?.click(); }}
+                  disabled={pdfStatus === 'loading'}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '6px',
+                    padding: '7px 13px', borderRadius: '7px',
+                    border: '1.5px solid var(--mauve-light)',
+                    backgroundColor: 'var(--mauve-pale)', color: 'var(--mauve)',
+                    cursor: pdfStatus === 'loading' ? 'not-allowed' : 'pointer',
+                    fontFamily: 'Georgia, serif', fontSize: '0.8rem', fontWeight: 'bold',
+                    opacity: pdfStatus === 'loading' ? 0.7 : 1,
+                    whiteSpace: 'nowrap',
+                  }}>
+                  {pdfStatus === 'loading' ? '⏳ Analyse…' : '📎 Importer mon patron (PDF)'}
+                </button>
+              </div>
+              <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: 'var(--brun-mid)', lineHeight: 1 }}>✕</button>
+            </div>
           </div>
 
+          {/* Feedback PDF */}
+          {pdfStatus === 'error' && (
+            <div style={{ backgroundColor: '#FAE8E8', border: '1px solid #D48080', borderRadius: '6px', padding: '8px 12px', marginBottom: '10px', fontSize: '0.8rem', color: '#943030' }}>
+              ⚠️ {pdfError}
+            </div>
+          )}
+          {pdfStatus === 'done' && (
+            <div style={{ backgroundColor: '#E8F5EC', border: '1px solid #80C894', borderRadius: '6px', padding: '8px 12px', marginBottom: '10px', fontSize: '0.8rem', color: '#2E7A46' }}>
+              ✅ Patron analysé et importé dans le formulaire — vérifiez les informations.
+            </div>
+          )}
+
           {/* Filtres */}
-          <div style={{ marginTop: '14px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
             <input
               className="field-input"
               type="text"
@@ -161,7 +250,6 @@ export default function CatalogBrowser({ onSelect, onClose }: CatalogBrowserProp
                 </p>
               )}
 
-              {/* Sélection taille */}
               <div style={{ marginBottom: '16px' }}>
                 <label className="field-label">Taille</label>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px', marginTop: '6px' }}>
@@ -180,7 +268,6 @@ export default function CatalogBrowser({ onSelect, onClose }: CatalogBrowserProp
                 </div>
               </div>
 
-              {/* Métrage recommandé */}
               {chosenSize && (() => {
                 const req = selected.fabricReqs.find(r => r.size === chosenSize);
                 if (!req) return null;

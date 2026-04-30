@@ -27,22 +27,39 @@ export async function POST(request: NextRequest) {
       ? `L'utilisatrice souhaite coudre la taille ${size}.`
       : `Utilise la taille médiane disponible sur le patron.`,
     ``,
-    `Identifie TOUTES les pièces du patron et estime leurs dimensions pour la taille choisie.`,
-    `Pour chaque pièce :`,
-    `- name : nom de la pièce en français (ex: "Devant", "Dos", "Manche", "Col", "Poche")`,
-    `- width_cm : largeur en cm de la boîte englobante pour la taille sélectionnée`,
-    `- height_cm : hauteur en cm de la boîte englobante`,
-    `- quantity : nombre de fois à couper (1 ou 2 généralement)`,
-    `- on_fold : true si la pièce se coupe sur le pli (la pièce est une demi-pièce)`,
-    `- notes : courte note facultative`,
+    `ÉTAPE 1 — Identifie le type de vêtement (robe, blouse, pantalon, manteau…).`,
     ``,
-    `Référence pour la taille ${size || 'médiane'} :`,
+    `ÉTAPE 2 — Liste CHAQUE pièce du patron séparément, en les nommant individuellement :`,
+    `  • "Manche droite" et "Manche gauche" au lieu de "Manche ×2"`,
+    `  • "Devant", "Dos", "Côté devant gauche", "Côté devant droit" selon la coupe`,
+    `  • "Col", "Col (dessus)", "Col (dessous)" si applicable`,
+    `  • Chaque pièce doit avoir un nom distinct et descriptif`,
+    ``,
+    `Pour chaque pièce, fournis :`,
+    `- name : nom précis en français (ex: "Devant", "Dos", "Manche droite", "Col")`,
+    `- width_cm : largeur de la boîte englobante en cm`,
+    `- height_cm : hauteur de la boîte englobante en cm`,
+    `- area_cm2 : surface RÉELLE estimée de la pièce en cm² (en tenant compte de la forme exacte : pince, courbe, échancrure, etc.) — ce doit être inférieur ou égal à width_cm × height_cm`,
+    `- quantity : 1 (chaque pièce est listée individuellement)`,
+    `- on_fold : true seulement si la pièce est représentée en demi (à couper sur le pli du tissu)`,
+    `- shape : type de forme dominant — "rectangle" | "trapeze" | "triangle" | "curved" | "irregular"`,
+    `- notes : courte note (grain de droit, asymétrie, entoilage…) — vide si rien à signaler`,
+    ``,
+    `Référence mensuration taille ${size || 'médiane'} (EU femme) :`,
     `poitrine ≈ ${sizeChart(size, 'bust')} cm | taille ≈ ${sizeChart(size, 'waist')} cm | hanches ≈ ${sizeChart(size, 'hip')} cm`,
     ``,
-    `IMPORTANT : si tu ne peux pas voir le patron clairement, estime les dimensions typiques pour ce type de vêtement et cette taille.`,
+    `IMPORTANT : si tu ne peux pas voir le patron clairement, estime des dimensions typiques pour ce vêtement et cette taille.`,
     ``,
-    `Réponds UNIQUEMENT avec un tableau JSON valide, sans markdown :`,
-    `[{"name":"Devant","width_cm":48,"height_cm":62,"quantity":1,"on_fold":true,"notes":""},...]`,
+    `Réponds UNIQUEMENT avec un objet JSON valide, sans markdown :`,
+    `{`,
+    `  "garment_type": "robe",`,
+    `  "pieces": [`,
+    `    {"name":"Devant","width_cm":48,"height_cm":62,"area_cm2":2400,"quantity":1,"on_fold":true,"shape":"trapeze","notes":"grain de droit vertical"},`,
+    `    {"name":"Dos","width_cm":46,"height_cm":60,"area_cm2":2280,"quantity":1,"on_fold":true,"shape":"trapeze","notes":""},`,
+    `    {"name":"Manche droite","width_cm":22,"height_cm":54,"area_cm2":850,"quantity":1,"on_fold":false,"shape":"curved","notes":""},`,
+    `    {"name":"Manche gauche","width_cm":22,"height_cm":54,"area_cm2":850,"quantity":1,"on_fold":false,"shape":"curved","notes":""}`,
+    `  ]`,
+    `}`,
   ].join('\n');
 
   const imageContent = isPdf
@@ -59,7 +76,7 @@ export async function POST(request: NextRequest) {
       },
       body: JSON.stringify({
         model: 'claude-opus-4-7',
-        max_tokens: 1024,
+        max_tokens: 2048,
         messages: [{ role: 'user', content: [imageContent, { type: 'text', text: prompt }] }],
       }),
     });
@@ -67,13 +84,29 @@ export async function POST(request: NextRequest) {
     const data = await res.json() as { content?: { text: string }[] };
     const text = data.content?.[0]?.text ?? '';
 
-    const jsonMatch = text.match(/\[[\s\S]*\]/);
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       return NextResponse.json({ error: 'Réponse IA non analysable', raw: text }, { status: 502 });
     }
 
-    const pieces = JSON.parse(jsonMatch[0]);
-    return NextResponse.json({ pieces });
+    const parsed = JSON.parse(jsonMatch[0]) as {
+      garment_type?: string;
+      pieces?: {
+        name: string;
+        width_cm: number;
+        height_cm: number;
+        area_cm2?: number;
+        quantity: number;
+        on_fold: boolean;
+        shape?: string;
+        notes?: string;
+      }[];
+    };
+
+    const pieces = parsed.pieces ?? [];
+    const garment_type = parsed.garment_type ?? 'autres';
+
+    return NextResponse.json({ pieces, garment_type });
 
   } catch (err) {
     return NextResponse.json({ error: String(err) }, { status: 500 });

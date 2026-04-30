@@ -7,7 +7,6 @@ interface FabricFormProps {
   onSubmit: (fabric: Omit<Fabric, 'id'>) => void;
 }
 
-/* Compresse une image en JPEG 900px max avant stockage localStorage */
 function compressImage(dataUrl: string): Promise<string> {
   return new Promise((resolve) => {
     const img = new Image();
@@ -24,41 +23,65 @@ function compressImage(dataUrl: string): Promise<string> {
   });
 }
 
-const FABRIC_TYPES = ['coton', 'lin', 'jersey', 'soie', 'laine', 'viscose', 'dentelle', 'autres'];
+const FABRIC_TYPES = ['coton', 'lin', 'jersey', 'soie', 'laine', 'viscose', 'dentelle', 'velours', 'satin', 'mousseline', 'tweed', 'chambray', 'canvas', 'autres'];
 
 export default function FabricForm({ onSubmit }: FabricFormProps) {
-  const [name,     setName]     = useState('');
-  const [color,    setColor]    = useState('#C4889A');
-  const [type,     setType]     = useState('coton');
-  const [pattern,  setPattern]  = useState('');
-  const [notes,    setNotes]    = useState('');
-  const [unit,     setUnit]     = useState<'cm' | 'inch'>('cm');
+  const [name,           setName]           = useState('');
+  const [color,          setColor]          = useState('#C4889A');
+  const [colorName,      setColorName]      = useState('');
+  const [detectingColor, setDetectingColor] = useState(false);
+  const [type,           setType]           = useState('');
+  const [pattern,        setPattern]        = useState('');
+  const [notes,          setNotes]          = useState('');
+  const [unit,           setUnit]           = useState<'cm' | 'inch'>('cm');
 
-  /* Métrage */
-  const [width,        setWidth]        = useState<string>('140'); // cm
-  const [lengthMeters, setLengthMeters] = useState<string>('2');   // mètres (mode normal)
-  const [scrapWidthCm, setScrapWidthCm] = useState<string>('');    // cm (mode chute)
-  const [scrapLenCm,   setScrapLenCm]   = useState<string>('');    // cm (mode chute)
+  const [width,        setWidth]        = useState<string>('140');
+  const [lengthMeters, setLengthMeters] = useState<string>('2');
+  const [scrapWidthCm, setScrapWidthCm] = useState<string>('');
+  const [scrapLenCm,   setScrapLenCm]   = useState<string>('');
 
-  /* Chute */
   const [isScrap,       setIsScrap]       = useState(false);
   const [estimatedArea, setEstimatedArea] = useState<string>('');
   const [estimating,    setEstimating]    = useState(false);
   const [estimateMsg,   setEstimateMsg]   = useState('');
 
-  /* Photos */
   const [photos,    setPhotos]    = useState<string[]>([]);
   const fileInputRef              = useRef<HTMLInputElement>(null);
 
+  const detectColor = async (imageDataUrl: string) => {
+    setDetectingColor(true);
+    try {
+      const res  = await fetch('/api/detect-color', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageDataUrl }),
+      });
+      const data = await res.json() as { hex?: string; name?: string; error?: string };
+      if (data.hex) {
+        setColor(data.hex);
+        setColorName(data.name ?? '');
+      }
+    } catch {
+      /* silencieux — la couleur reste inchangée */
+    } finally {
+      setDetectingColor(false);
+    }
+  };
+
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
+    let firstPhoto = true;
     for (const file of files) {
       const reader = new FileReader();
       reader.onload = async (ev) => {
         const compressed = await compressImage(ev.target!.result as string);
-        setPhotos(prev => [...prev, compressed]);
+        setPhotos(prev => {
+          if (firstPhoto && prev.length === 0) detectColor(compressed);
+          return [...prev, compressed];
+        });
       };
       reader.readAsDataURL(file);
+      firstPhoto = false;
     }
     e.target.value = '';
   };
@@ -90,7 +113,7 @@ export default function FabricForm({ onSubmit }: FabricFormProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    let w = parseFloat(width)  || 0;
+    let w = parseFloat(width) || 0;
     let l = 0;
     if (unit === 'inch') w *= 2.54;
 
@@ -104,7 +127,7 @@ export default function FabricForm({ onSubmit }: FabricFormProps) {
     }
 
     onSubmit({
-      name, color, type,
+      name, color, type: type || 'coton',
       width: w,
       length: l,
       pattern:       pattern       || undefined,
@@ -114,12 +137,11 @@ export default function FabricForm({ onSubmit }: FabricFormProps) {
       estimatedArea: estimatedArea ? parseFloat(estimatedArea) : undefined,
     });
 
-    setName(''); setColor('#C4889A'); setType('coton'); setPattern(''); setNotes('');
+    setName(''); setColor('#C4889A'); setColorName(''); setType(''); setPattern(''); setNotes('');
     setWidth('140'); setLengthMeters('2'); setScrapWidthCm(''); setScrapLenCm('');
     setIsScrap(false); setPhotos([]); setEstimatedArea(''); setEstimateMsg('');
   };
 
-  /* ── Styles partagés ─────────────────────────────────────────── */
   const row2 = { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' } as const;
 
   return (
@@ -135,21 +157,56 @@ export default function FabricForm({ onSubmit }: FabricFormProps) {
           <input className="field-input" required value={name}
             onChange={e => setName(e.target.value)} placeholder="Ex : Lin bleu ardoise" />
         </div>
+
+        {/* Type — combobox libre */}
         <div>
           <label className="field-label">Type</label>
-          <select className="field-input" value={type} onChange={e => setType(e.target.value)}>
-            {FABRIC_TYPES.map(t => <option key={t}>{t}</option>)}
-          </select>
+          <input
+            className="field-input"
+            list="fabric-types-list"
+            value={type}
+            onChange={e => setType(e.target.value)}
+            placeholder="Ex : coton, lin, jersey…"
+          />
+          <datalist id="fabric-types-list">
+            {FABRIC_TYPES.map(t => <option key={t} value={t} />)}
+          </datalist>
         </div>
-        <div>
-          <label className="field-label">Couleur</label>
+
+        {/* Couleur + détection auto */}
+        <div style={{ gridColumn: '1 / -1' }}>
+          <label className="field-label">
+            Couleur
+            {detectingColor && (
+              <span style={{ marginLeft: '8px', fontSize: '0.72rem', color: 'var(--mauve)', fontStyle: 'italic' }}>
+                ⏳ Détection en cours…
+              </span>
+            )}
+            {colorName && !detectingColor && (
+              <span style={{ marginLeft: '8px', fontSize: '0.72rem', color: 'var(--brun-mid)', fontStyle: 'italic' }}>
+                — {colorName} (détecté automatiquement)
+              </span>
+            )}
+          </label>
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <input type="color" value={color} onChange={e => setColor(e.target.value)}
+            <input type="color" value={color} onChange={e => { setColor(e.target.value); setColorName(''); }}
               style={{ width: '44px', height: '38px', border: '1.5px solid var(--mauve-pale)', borderRadius: '6px', padding: '2px', cursor: 'pointer' }} />
             <input className="field-input" type="text" value={color}
-              onChange={e => setColor(e.target.value)} style={{ flex: 1 }} />
+              onChange={e => { setColor(e.target.value); setColorName(''); }} style={{ flex: 1 }}
+              placeholder="#RRGGBB" />
+            {photos.length > 0 && !detectingColor && (
+              <button type="button" onClick={() => detectColor(photos[0])}
+                style={{
+                  padding: '6px 12px', borderRadius: '6px', border: '1.5px solid var(--mauve-light)',
+                  backgroundColor: 'var(--mauve-pale)', color: 'var(--mauve)',
+                  cursor: 'pointer', fontSize: '0.75rem', fontFamily: 'Georgia, serif', whiteSpace: 'nowrap',
+                }}>
+                🎨 Détecter
+              </button>
+            )}
           </div>
         </div>
+
         <div>
           <label className="field-label">Motif</label>
           <input className="field-input" value={pattern}
@@ -170,7 +227,6 @@ export default function FabricForm({ onSubmit }: FabricFormProps) {
           transition: 'all 0.2s',
         }}
       >
-        {/* Pill toggle */}
         <span style={{
           display: 'inline-block', width: '44px', height: '24px', borderRadius: '12px',
           backgroundColor: isScrap ? 'var(--mauve)' : '#ccc',
@@ -198,7 +254,6 @@ export default function FabricForm({ onSubmit }: FabricFormProps) {
       {!isScrap ? (
         <div style={{ marginBottom: '16px' }}>
           <label className="field-label">Métrage</label>
-          {/* Unité largeur */}
           <div style={{ display: 'flex', gap: '6px', marginBottom: '10px' }}>
             {(['cm', 'inch'] as const).map(u => (
               <button key={u} type="button" onClick={() => setUnit(u)}
@@ -248,6 +303,11 @@ export default function FabricForm({ onSubmit }: FabricFormProps) {
       <div style={{ marginBottom: '16px' }}>
         <label className="field-label">
           {isScrap ? 'Photo de la chute' : 'Photos du tissu'}
+          {photos.length === 0 && (
+            <span style={{ marginLeft: '8px', fontSize: '0.72rem', color: 'var(--brun-mid)', fontStyle: 'italic', fontWeight: 'normal' }}>
+              La couleur sera détectée automatiquement
+            </span>
+          )}
         </label>
 
         {photos.length > 0 && (

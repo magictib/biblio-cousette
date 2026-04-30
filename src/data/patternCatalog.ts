@@ -6,7 +6,6 @@ export interface CatalogEntry {
   difficulty: 'facile' | 'moyen' | 'difficile';
   description: string;
   sizes: string[];
-  /** Métrage recommandé selon la taille et la largeur du tissu */
   fabricReqs: { size: string; widthCm: number; meters: number }[];
   piecesCount?: number;
   url?: string;
@@ -128,6 +127,71 @@ const catalog: CatalogEntry[] = [
     ],
     piecesCount: 12,
   },
+  {
+    id: 'dd-cosmos',
+    name: 'Cosmos',
+    designer: 'Deer & Doe',
+    clothingType: 'jupe',
+    difficulty: 'facile',
+    description: 'Jupe évasée en A avec deux poches latérales. Taille avec ceinture élastiquée partielle.',
+    sizes: ['34','36','38','40','42','44','46'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 0.80 },
+      { size: '38', widthCm: 140, meters: 0.85 },
+      { size: '40', widthCm: 140, meters: 0.90 },
+      { size: '42', widthCm: 140, meters: 0.95 },
+    ],
+    piecesCount: 4,
+  },
+  {
+    id: 'dd-sureau',
+    name: 'Sureau',
+    designer: 'Deer & Doe',
+    clothingType: 'sweat',
+    difficulty: 'facile',
+    description: 'Sweat oversize avec manches raglan et col en bord-côte. Coupe décontractée, couture facile.',
+    sizes: ['34','36','38','40','42','44','46'],
+    fabricReqs: [
+      { size: '36', widthCm: 150, meters: 1.40 },
+      { size: '38', widthCm: 150, meters: 1.50 },
+      { size: '40', widthCm: 150, meters: 1.60 },
+      { size: '42', widthCm: 150, meters: 1.70 },
+    ],
+    piecesCount: 5,
+  },
+  {
+    id: 'dd-ophrys',
+    name: 'Ophrys',
+    designer: 'Deer & Doe',
+    clothingType: 'robe',
+    difficulty: 'moyen',
+    description: 'Robe d\'hiver avec col montant, manches longues et jupe évasée. Tissu tissé recommandé.',
+    sizes: ['34','36','38','40','42','44','46'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 2.00 },
+      { size: '38', widthCm: 140, meters: 2.15 },
+      { size: '40', widthCm: 140, meters: 2.25 },
+      { size: '42', widthCm: 140, meters: 2.40 },
+    ],
+    piecesCount: 7,
+  },
+  {
+    id: 'dd-edelweiss',
+    name: 'Édelweiss',
+    designer: 'Deer & Doe',
+    clothingType: 'robe',
+    difficulty: 'difficile',
+    description: 'Robe longue de soirée avec corsage ajusté, baleines et jupe volumineuse à plis.',
+    sizes: ['34','36','38','40','42','44','46'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 3.20 },
+      { size: '38', widthCm: 140, meters: 3.40 },
+      { size: '40', widthCm: 140, meters: 3.60 },
+      { size: '42', widthCm: 140, meters: 3.80 },
+    ],
+    piecesCount: 14,
+  },
+
   /* ── Camimade ───────────────────────────────────────────────── */
   {
     id: 'cami-pepite',
@@ -194,6 +258,7 @@ const catalog: CatalogEntry[] = [
     ],
     piecesCount: 8,
   },
+
   /* ── Ikatee ─────────────────────────────────────────────────── */
   {
     id: 'ika-emma',
@@ -227,6 +292,23 @@ const catalog: CatalogEntry[] = [
     ],
     piecesCount: 9,
   },
+  {
+    id: 'ika-lena',
+    name: 'Léna',
+    designer: 'Ikatee',
+    clothingType: 'robe',
+    difficulty: 'facile',
+    description: 'Robe d\'été en jersey avec col en V et dos nageur. Simple et flatteuse.',
+    sizes: ['36','38','40','42','44','46'],
+    fabricReqs: [
+      { size: '36', widthCm: 150, meters: 1.60 },
+      { size: '38', widthCm: 150, meters: 1.70 },
+      { size: '40', widthCm: 150, meters: 1.80 },
+      { size: '42', widthCm: 150, meters: 1.90 },
+    ],
+    piecesCount: 4,
+  },
+
   /* ── République du Chiffon ──────────────────────────────────── */
   {
     id: 'rdc-zoe',
@@ -260,6 +342,39 @@ const catalog: CatalogEntry[] = [
     ],
     piecesCount: 7,
   },
+  {
+    id: 'rdc-anatole',
+    name: 'Anatole',
+    designer: 'République du Chiffon',
+    clothingType: 'blouse',
+    difficulty: 'moyen',
+    description: 'Blouse fluide à manches pagode et col à nouer. Tissu léger recommandé (viscose, soie).',
+    sizes: ['34','36','38','40','42','44','46'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 1.50 },
+      { size: '38', widthCm: 140, meters: 1.60 },
+      { size: '40', widthCm: 140, meters: 1.70 },
+      { size: '42', widthCm: 140, meters: 1.80 },
+    ],
+    piecesCount: 6,
+  },
+  {
+    id: 'rdc-leon',
+    name: 'Léon',
+    designer: 'République du Chiffon',
+    clothingType: 'pantalon',
+    difficulty: 'moyen',
+    description: 'Pantalon boyfriend taille haute avec pince et large revers. Style androgyne chic.',
+    sizes: ['34','36','38','40','42','44','46'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 1.45 },
+      { size: '38', widthCm: 140, meters: 1.55 },
+      { size: '40', widthCm: 140, meters: 1.65 },
+      { size: '42', widthCm: 140, meters: 1.75 },
+    ],
+    piecesCount: 6,
+  },
+
   /* ── Burda Style ────────────────────────────────────────────── */
   {
     id: 'burda-112-2023',
@@ -293,6 +408,7 @@ const catalog: CatalogEntry[] = [
     ],
     piecesCount: 14,
   },
+
   /* ── Named Clothing ─────────────────────────────────────────── */
   {
     id: 'named-valo',
@@ -310,7 +426,306 @@ const catalog: CatalogEntry[] = [
     ],
     piecesCount: 7,
   },
-  /* ── Patron gratuit (référence) ─────────────────────────────── */
+  {
+    id: 'named-otso',
+    name: 'Otso',
+    designer: 'Named Clothing',
+    clothingType: 'manteau',
+    difficulty: 'difficile',
+    description: 'Manteau oversize minimaliste avec poches intérieures et col à revers droit. Style nordique épuré.',
+    sizes: ['34','36','38','40','42','44','46','48','50','52'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 2.80 },
+      { size: '38', widthCm: 140, meters: 3.00 },
+      { size: '40', widthCm: 140, meters: 3.20 },
+      { size: '42', widthCm: 140, meters: 3.40 },
+    ],
+    piecesCount: 11,
+  },
+  {
+    id: 'named-saga',
+    name: 'Saga',
+    designer: 'Named Clothing',
+    clothingType: 'combinaison',
+    difficulty: 'moyen',
+    description: 'Combinaison pantalon à jambes larges avec taille haute et bretelles fines. Look chic minimaliste.',
+    sizes: ['34','36','38','40','42','44','46','48','50'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 2.00 },
+      { size: '38', widthCm: 140, meters: 2.15 },
+      { size: '40', widthCm: 140, meters: 2.25 },
+      { size: '42', widthCm: 140, meters: 2.40 },
+    ],
+    piecesCount: 8,
+  },
+
+  /* ── Fibre Mood ─────────────────────────────────────────────── */
+  {
+    id: 'fm-gio',
+    name: 'Gio',
+    designer: 'Fibre Mood',
+    clothingType: 'blouse',
+    difficulty: 'facile',
+    description: 'Blouse ample col V profond avec manches à volant. Tissu fluide conseillé.',
+    sizes: ['34','36','38','40','42','44','46','48'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 1.50 },
+      { size: '38', widthCm: 140, meters: 1.60 },
+      { size: '40', widthCm: 140, meters: 1.70 },
+      { size: '42', widthCm: 140, meters: 1.80 },
+    ],
+    piecesCount: 4,
+  },
+  {
+    id: 'fm-josie',
+    name: 'Josie',
+    designer: 'Fibre Mood',
+    clothingType: 'pull',
+    difficulty: 'facile',
+    description: 'Pull oversize col bateau en molleton ou jersey épais. Manches raglan et poches kangourou.',
+    sizes: ['34','36','38','40','42','44','46','48'],
+    fabricReqs: [
+      { size: '36', widthCm: 150, meters: 1.50 },
+      { size: '38', widthCm: 150, meters: 1.60 },
+      { size: '40', widthCm: 150, meters: 1.70 },
+      { size: '42', widthCm: 150, meters: 1.80 },
+    ],
+    piecesCount: 4,
+  },
+  {
+    id: 'fm-diana',
+    name: 'Diana',
+    designer: 'Fibre Mood',
+    clothingType: 'pantalon',
+    difficulty: 'moyen',
+    description: 'Pantalon taille haute jambe droite avec pince et fermeture sur le côté. Tissu tissé fluide.',
+    sizes: ['34','36','38','40','42','44','46','48'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 1.40 },
+      { size: '38', widthCm: 140, meters: 1.50 },
+      { size: '40', widthCm: 140, meters: 1.60 },
+      { size: '42', widthCm: 140, meters: 1.70 },
+    ],
+    piecesCount: 5,
+  },
+  {
+    id: 'fm-morgan',
+    name: 'Morgan',
+    designer: 'Fibre Mood',
+    clothingType: 'robe',
+    difficulty: 'moyen',
+    description: 'Robe chemise boutonnée avec ceinture à nouer et poches plaquées. Classique revisité.',
+    sizes: ['34','36','38','40','42','44','46','48'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 2.10 },
+      { size: '38', widthCm: 140, meters: 2.20 },
+      { size: '40', widthCm: 140, meters: 2.30 },
+      { size: '42', widthCm: 140, meters: 2.45 },
+    ],
+    piecesCount: 9,
+  },
+
+  /* ── Tilly and the Buttons ──────────────────────────────────── */
+  {
+    id: 'tilly-coco',
+    name: 'Coco',
+    designer: 'Tilly and the Buttons',
+    clothingType: 't-shirt',
+    difficulty: 'facile',
+    description: 'T-shirt ou mini-robe en jersey. Col rond, manches courtes ou longues. Patron de débutante iconique.',
+    sizes: ['34','36','38','40','42','44','46','48','50'],
+    fabricReqs: [
+      { size: '36', widthCm: 150, meters: 0.90 },
+      { size: '38', widthCm: 150, meters: 1.00 },
+      { size: '40', widthCm: 150, meters: 1.10 },
+      { size: '42', widthCm: 150, meters: 1.20 },
+    ],
+    piecesCount: 3,
+  },
+  {
+    id: 'tilly-agnes',
+    name: 'Agnes',
+    designer: 'Tilly and the Buttons',
+    clothingType: 'robe',
+    difficulty: 'facile',
+    description: 'Robe trapèze sans manche avec encolure bateau. Ligne simple, facilement personnalisable.',
+    sizes: ['34','36','38','40','42','44','46','48','50'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 1.50 },
+      { size: '38', widthCm: 140, meters: 1.60 },
+      { size: '40', widthCm: 140, meters: 1.70 },
+      { size: '42', widthCm: 140, meters: 1.80 },
+    ],
+    piecesCount: 3,
+  },
+  {
+    id: 'tilly-bettine',
+    name: 'Bettine',
+    designer: 'Tilly and the Buttons',
+    clothingType: 'robe',
+    difficulty: 'moyen',
+    description: 'Robe col Claudine avec jupe évasée et manches kimono. Inspiration vintage 60s.',
+    sizes: ['34','36','38','40','42','44','46','48','50'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 2.00 },
+      { size: '38', widthCm: 140, meters: 2.15 },
+      { size: '40', widthCm: 140, meters: 2.25 },
+      { size: '42', widthCm: 140, meters: 2.40 },
+    ],
+    piecesCount: 6,
+  },
+
+  /* ── Grainline Studio ───────────────────────────────────────── */
+  {
+    id: 'gs-scout',
+    name: 'Scout',
+    designer: 'Grainline Studio',
+    clothingType: 't-shirt',
+    difficulty: 'facile',
+    description: 'T-shirt en jersey avec col en V, petites poches poitrine option. Coupe casual américaine.',
+    sizes: ['34','36','38','40','42','44','46','48'],
+    fabricReqs: [
+      { size: '36', widthCm: 150, meters: 0.95 },
+      { size: '38', widthCm: 150, meters: 1.05 },
+      { size: '40', widthCm: 150, meters: 1.15 },
+      { size: '42', widthCm: 150, meters: 1.25 },
+    ],
+    piecesCount: 4,
+  },
+  {
+    id: 'gs-linden',
+    name: 'Linden',
+    designer: 'Grainline Studio',
+    clothingType: 'sweat',
+    difficulty: 'facile',
+    description: 'Sweat à capuche ou col rond avec poche kangourou. Manches raglan et coutures en jersey.',
+    sizes: ['34','36','38','40','42','44','46','48'],
+    fabricReqs: [
+      { size: '36', widthCm: 150, meters: 1.50 },
+      { size: '38', widthCm: 150, meters: 1.60 },
+      { size: '40', widthCm: 150, meters: 1.70 },
+      { size: '42', widthCm: 150, meters: 1.80 },
+    ],
+    piecesCount: 6,
+  },
+  {
+    id: 'gs-archer',
+    name: 'Archer',
+    designer: 'Grainline Studio',
+    clothingType: 'chemise',
+    difficulty: 'moyen',
+    description: 'Chemise boutonnée classique avec col chemisier, poignets boutonnés et yoke dos. Tissé recommandé.',
+    sizes: ['34','36','38','40','42','44','46','48'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 1.80 },
+      { size: '38', widthCm: 140, meters: 1.90 },
+      { size: '40', widthCm: 140, meters: 2.00 },
+      { size: '42', widthCm: 140, meters: 2.15 },
+    ],
+    piecesCount: 10,
+  },
+
+  /* ── Maison Fauve ───────────────────────────────────────────── */
+  {
+    id: 'mf-rosehip',
+    name: 'Rose Hip',
+    designer: 'Maison Fauve',
+    clothingType: 'robe',
+    difficulty: 'facile',
+    description: 'Robe évasée style années 50 avec petits pois ou imprimé. Col bateau et fermeture dos.',
+    sizes: ['34','36','38','40','42','44','46'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 1.70 },
+      { size: '38', widthCm: 140, meters: 1.80 },
+      { size: '40', widthCm: 140, meters: 1.90 },
+      { size: '42', widthCm: 140, meters: 2.00 },
+    ],
+    piecesCount: 5,
+  },
+  {
+    id: 'mf-amarante',
+    name: 'Amarante',
+    designer: 'Maison Fauve',
+    clothingType: 'blouse',
+    difficulty: 'moyen',
+    description: 'Blouse avec volant frontal et manches légèrement bouffantes. Col discret et coupe flatteuse.',
+    sizes: ['34','36','38','40','42','44','46'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 1.55 },
+      { size: '38', widthCm: 140, meters: 1.65 },
+      { size: '40', widthCm: 140, meters: 1.75 },
+      { size: '42', widthCm: 140, meters: 1.85 },
+    ],
+    piecesCount: 6,
+  },
+  {
+    id: 'mf-bouton-or',
+    name: 'Bouton d\'Or',
+    designer: 'Maison Fauve',
+    clothingType: 'robe',
+    difficulty: 'moyen',
+    description: 'Robe smockée à taille marquée avec manches élastiquées et jupe évasée. Très féminine.',
+    sizes: ['34','36','38','40','42','44','46'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 2.00 },
+      { size: '38', widthCm: 140, meters: 2.15 },
+      { size: '40', widthCm: 140, meters: 2.25 },
+      { size: '42', widthCm: 140, meters: 2.40 },
+    ],
+    piecesCount: 6,
+  },
+
+  /* ── Atelier Scammit ────────────────────────────────────────── */
+  {
+    id: 'as-alexia',
+    name: 'Alexia',
+    designer: 'Atelier Scammit',
+    clothingType: 'robe',
+    difficulty: 'facile',
+    description: 'Robe balnéaire sans manche avec décolleté en V et jupe froncée. Coupe estivale légère.',
+    sizes: ['34','36','38','40','42','44','46'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 1.60 },
+      { size: '38', widthCm: 140, meters: 1.70 },
+      { size: '40', widthCm: 140, meters: 1.80 },
+      { size: '42', widthCm: 140, meters: 1.90 },
+    ],
+    piecesCount: 4,
+  },
+  {
+    id: 'as-moline',
+    name: 'Moline',
+    designer: 'Atelier Scammit',
+    clothingType: 'blouse',
+    difficulty: 'moyen',
+    description: 'Blouse paysanne avec col élastiqué et manches bouffantes. Tissu léger recommandé.',
+    sizes: ['34','36','38','40','42','44','46'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 1.45 },
+      { size: '38', widthCm: 140, meters: 1.55 },
+      { size: '40', widthCm: 140, meters: 1.65 },
+      { size: '42', widthCm: 140, meters: 1.75 },
+    ],
+    piecesCount: 4,
+  },
+  {
+    id: 'as-margot',
+    name: 'Margot',
+    designer: 'Atelier Scammit',
+    clothingType: 'pantalon',
+    difficulty: 'facile',
+    description: 'Pantalon palazzo taille élastique entièrement, jambes très larges. Rapide à coudre.',
+    sizes: ['34','36','38','40','42','44','46'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 1.40 },
+      { size: '38', widthCm: 140, meters: 1.50 },
+      { size: '40', widthCm: 140, meters: 1.60 },
+      { size: '42', widthCm: 140, meters: 1.70 },
+    ],
+    piecesCount: 3,
+  },
+
+  /* ── Patrons libres ─────────────────────────────────────────── */
   {
     id: 'gratuit-tote-bag',
     name: 'Tote Bag classique',
@@ -323,6 +738,35 @@ const catalog: CatalogEntry[] = [
       { size: 'unique', widthCm: 140, meters: 0.60 },
     ],
     piecesCount: 3,
+  },
+  {
+    id: 'gratuit-pantalon-elastique',
+    name: 'Pantalon élastiqué basique',
+    designer: 'Patron libre',
+    clothingType: 'pantalon',
+    difficulty: 'facile',
+    description: 'Pantalon tout-élastique à la taille, deux jambes droites simples. Premier pantalon conseillé.',
+    sizes: ['36','38','40','42','44','46'],
+    fabricReqs: [
+      { size: '36', widthCm: 140, meters: 1.30 },
+      { size: '38', widthCm: 140, meters: 1.40 },
+      { size: '40', widthCm: 140, meters: 1.50 },
+      { size: '42', widthCm: 140, meters: 1.60 },
+    ],
+    piecesCount: 2,
+  },
+  {
+    id: 'gratuit-bandana',
+    name: 'Bandana réversible',
+    designer: 'Patron libre',
+    clothingType: 'accessoire',
+    difficulty: 'facile',
+    description: 'Bandana réversible cousu en deux fois, idéal pour les chutes de tissu. Patron carré simple.',
+    sizes: ['unique'],
+    fabricReqs: [
+      { size: 'unique', widthCm: 140, meters: 0.30 },
+    ],
+    piecesCount: 1,
   },
 ];
 

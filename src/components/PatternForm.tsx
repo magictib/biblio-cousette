@@ -8,7 +8,7 @@ interface PatternFormProps {
   onSubmit: (pattern: Omit<Pattern, 'id'>) => void;
 }
 
-const CLOTHING_TYPES = ['robe', 't-shirt', 'pull', 'blouse', 'pantalon', 'jupe', 'veste', 'manteau', 'combinaison', 'accessoire', 'sous-vêtement', 'autres'];
+const CLOTHING_TYPES = ['robe', 't-shirt', 'pull', 'blouse', 'pantalon', 'jupe', 'veste', 'manteau', 'combinaison', 'sweat', 'chemise', 'accessoire', 'sous-vêtement', 'pyjama', 'robe de chambre', 'maillot', 'autres'];
 
 export default function PatternForm({ onSubmit }: PatternFormProps) {
   const [name,         setName]         = useState('');
@@ -95,9 +95,16 @@ export default function PatternForm({ onSubmit }: PatternFormProps) {
 
           <div>
             <label className="field-label">Type de vêtement</label>
-            <select className="field-input" value={clothingType} onChange={e => setClothingType(e.target.value)}>
-              {CLOTHING_TYPES.map(t => <option key={t}>{t}</option>)}
-            </select>
+            <input
+              className="field-input"
+              list="clothing-types-list"
+              value={clothingType}
+              onChange={e => setClothingType(e.target.value)}
+              placeholder="Ex : robe, blouse, pantalon…"
+            />
+            <datalist id="clothing-types-list">
+              {CLOTHING_TYPES.map(t => <option key={t} value={t} />)}
+            </datalist>
           </div>
 
           <div>

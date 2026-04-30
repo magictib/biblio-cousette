@@ -6,7 +6,7 @@ import { loadFabrics } from '@/utils/migrate';
 import LayPlanCanvas, { PatternPiece } from './LayPlanCanvas';
 
 const EMPTY_PIECE = (): PatternPiece => ({
-  name: '', widthCm: 0, heightCm: 0, quantity: 1, onFold: false,
+  name: '', widthCm: 0, heightCm: 0, quantity: 1, onFold: false, areaCm2: undefined, shape: undefined,
 });
 
 type AnalysisStatus = 'idle' | 'loading' | 'done' | 'error';
@@ -51,7 +51,7 @@ export default function LayPlanTool() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ fileDataUrl: dataUrl, size }),
         });
-        const data = await res.json() as { pieces?: { name: string; width_cm: number; height_cm: number; quantity: number; on_fold: boolean; notes?: string }[]; error?: string };
+        const data = await res.json() as { pieces?: { name: string; width_cm: number; height_cm: number; area_cm2?: number; quantity: number; on_fold: boolean; shape?: string; notes?: string }[]; garment_type?: string; error?: string };
 
         if (data.error) {
           setStatus('error');
@@ -66,6 +66,8 @@ export default function LayPlanTool() {
             heightCm: p.height_cm,
             quantity: p.quantity,
             onFold:   p.on_fold,
+            areaCm2:  p.area_cm2,
+            shape:    p.shape as PatternPiece['shape'],
           })));
           setStatus('done');
         } else {
