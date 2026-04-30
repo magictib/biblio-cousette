@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Fabric } from '@/types';
 import { loadFabrics } from '@/utils/migrate';
 import LayPlanCanvas, { PatternPiece } from './LayPlanCanvas';
+import { analyzePattern } from '@/utils/gemini';
 
 const EMPTY_PIECE = (): PatternPiece => ({
   name: '', widthCm: 0, heightCm: 0, quantity: 1, onFold: false, areaCm2: undefined, shape: undefined,
@@ -46,19 +47,7 @@ export default function LayPlanTool() {
     reader.onload = async (ev) => {
       const dataUrl = ev.target!.result as string;
       try {
-        const res  = await fetch('/api/analyze-pattern', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ fileDataUrl: dataUrl, size }),
-        });
-        const data = await res.json() as { pieces?: { name: string; width_cm: number; height_cm: number; area_cm2?: number; quantity: number; on_fold: boolean; shape?: string; notes?: string }[]; garment_type?: string; error?: string };
-
-        if (data.error) {
-          setStatus('error');
-          setErrorMsg(data.error);
-          return;
-        }
-
+        const data = await analyzePattern(dataUrl, size);
         if (data.pieces && data.pieces.length > 0) {
           setPieces(data.pieces.map(p => ({
             name:     p.name,
@@ -74,9 +63,9 @@ export default function LayPlanTool() {
           setStatus('error');
           setErrorMsg('Aucune pièce identifiée. Essayez avec une image plus nette.');
         }
-      } catch {
+      } catch (err) {
         setStatus('error');
-        setErrorMsg('Erreur réseau.');
+        setErrorMsg(String(err).replace('Error: ', ''));
       }
     };
     reader.readAsDataURL(file);

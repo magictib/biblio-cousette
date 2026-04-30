@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { Fabric } from '@/types';
+import { detectColorFromImage, estimateScrapArea } from '@/utils/gemini';
 
 interface FabricFormProps {
   onSubmit: (fabric: Omit<Fabric, 'id'>) => void;
@@ -51,16 +52,9 @@ export default function FabricForm({ onSubmit }: FabricFormProps) {
   const detectColor = async (imageDataUrl: string) => {
     setDetectingColor(true);
     try {
-      const res  = await fetch('/api/detect-color', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageDataUrl }),
-      });
-      const data = await res.json() as { hex?: string; name?: string; error?: string };
-      if (data.hex) {
-        setColor(data.hex);
-        setColorName(data.name ?? '');
-      }
+      const result = await detectColorFromImage(imageDataUrl);
+      setColor(result.hex);
+      setColorName(result.name);
     } catch {
       /* silencieux — la couleur reste inchangée */
     } finally {
@@ -91,20 +85,11 @@ export default function FabricForm({ onSubmit }: FabricFormProps) {
     setEstimating(true);
     setEstimateMsg('');
     try {
-      const res  = await fetch('/api/estimate-scrap', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageDataUrl: photos[0] }),
-      });
-      const data = await res.json();
-      if (data.error) {
-        setEstimateMsg(`Erreur : ${data.error}`);
-      } else {
-        setEstimatedArea(String(Math.round(data.area_cm2)));
-        setEstimateMsg(data.note ?? '');
-      }
-    } catch {
-      setEstimateMsg('Erreur réseau — saisissez la surface manuellement.');
+      const result = await estimateScrapArea(photos[0]);
+      setEstimatedArea(String(Math.round(result.area_cm2)));
+      setEstimateMsg(result.note ?? '');
+    } catch (err) {
+      setEstimateMsg(`Erreur : ${String(err).replace('Error: ', '')} — saisissez la surface manuellement.`);
     } finally {
       setEstimating(false);
     }

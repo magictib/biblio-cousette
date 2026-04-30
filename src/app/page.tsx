@@ -5,6 +5,7 @@ import Inventory from '@/components/Inventory';
 import PatternFitter from '@/components/PatternFitter';
 import ProjectGallery from '@/components/ProjectGallery';
 import LayPlanTool from '@/components/LayPlanTool';
+import ApiKeySetup from '@/components/ApiKeySetup';
 
 type Tab = 'inventory' | 'fitter' | 'projects' | 'layplan';
 
@@ -75,6 +76,7 @@ export default function Home() {
 
   return (
     <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '32px 20px' }}>
+      <ApiKeySetup />
 
       {/* ── Navigation mobile ─────────────────────────────────────── */}
       <nav className="md:hidden" style={{ marginBottom: '20px' }}>

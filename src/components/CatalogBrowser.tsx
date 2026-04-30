@@ -3,6 +3,7 @@
 import { useState, useMemo, useRef } from 'react';
 import catalog, { CatalogEntry } from '@/data/patternCatalog';
 import { Pattern } from '@/types';
+import { analyzePattern } from '@/utils/gemini';
 
 interface CatalogBrowserProps {
   onSelect: (pattern: Omit<Pattern, 'id'>, fabricMeters?: number) => void;
@@ -66,39 +67,21 @@ export default function CatalogBrowser({ onSelect, onClose }: CatalogBrowserProp
     reader.onload = async (ev) => {
       const dataUrl = ev.target!.result as string;
       try {
-        const res  = await fetch('/api/analyze-pattern', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ fileDataUrl: dataUrl, size: '38' }),
-        });
-        const data = await res.json() as {
-          pieces?: unknown[];
-          garment_type?: string;
-          error?: string;
-        };
-
-        if (data.error) {
-          setPdfStatus('error');
-          setPdfError(data.error);
-          return;
-        }
-
-        const garmentType = data.garment_type ?? 'autres';
+        const data = await analyzePattern(dataUrl, '38');
         const piecesCount = data.pieces?.length ?? 0;
-
         onSelect({
-          name:         `Patron importé (${garmentType})`,
+          name:         `Patron importé (${data.garment_type})`,
           designer:     '',
-          clothingType: garmentType,
+          clothingType: data.garment_type,
           difficulty:   'moyen',
           width:        140,
           height:       100,
           notes:        `Importé via PDF — ${piecesCount} pièce${piecesCount > 1 ? 's' : ''} identifiée${piecesCount > 1 ? 's' : ''}`,
         });
         setPdfStatus('done');
-      } catch {
+      } catch (err) {
         setPdfStatus('error');
-        setPdfError('Erreur réseau lors de l\'analyse.');
+        setPdfError(String(err).replace('Error: ', ''));
       }
     };
     reader.readAsDataURL(file);
