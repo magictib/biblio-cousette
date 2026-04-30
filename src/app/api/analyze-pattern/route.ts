@@ -73,6 +73,7 @@ export async function POST(request: NextRequest) {
         'Content-Type': 'application/json',
         'x-api-key': apiKey,
         'anthropic-version': '2023-06-01',
+        ...(isPdf ? { 'anthropic-beta': 'pdfs-2024-09-25' } : {}),
       },
       body: JSON.stringify({
         model: 'claude-opus-4-7',
@@ -84,9 +85,11 @@ export async function POST(request: NextRequest) {
     const data = await res.json() as { content?: { text: string }[] };
     const text = data.content?.[0]?.text ?? '';
 
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    /* Essaie d'extraire le JSON même si Claude ajoute du texte autour */
+    const jsonMatch = text.match(/\{[\s\S]*\}/) ?? text.match(/\[[\s\S]*\]/);
     if (!jsonMatch) {
-      return NextResponse.json({ error: 'Réponse IA non analysable', raw: text }, { status: 502 });
+      const preview = text.slice(0, 300);
+      return NextResponse.json({ error: `Réponse IA non analysable : ${preview}`, raw: text }, { status: 502 });
     }
 
     const parsed = JSON.parse(jsonMatch[0]) as {
