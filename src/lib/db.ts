@@ -1,70 +1,79 @@
 import {
   collection, doc, getDocs, setDoc, deleteDoc,
 } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { db, storage } from './firebase';
-import { Fabric, Pattern, Project, Creation } from '@/types';
+import { db } from './firebase';
+import { saveBinaryIDB, loadBinaryIDB } from '@/utils/idb';
+import { Fabric, Pattern, PatternFile, Project, Creation } from '@/types';
 
-// Upload un dataUrl (base64) vers Firebase Storage et retourne l'URL publique.
-// Si la valeur est déjà une URL https://, on la renvoie telle quelle.
-async function uploadIfNeeded(path: string, value: string): Promise<string> {
-  if (!value || !value.startsWith('data:')) return value;
-  const [header, b64] = value.split(',');
-  const mime = header.match(/:(.*?);/)?.[1] ?? 'application/octet-stream';
-  const bytes = atob(b64);
-  const arr = new Uint8Array(bytes.length);
-  for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
-  const blob = new Blob([arr], { type: mime });
-  const storageRef = ref(storage, path);
-  await uploadBytes(storageRef, blob);
-  return getDownloadURL(storageRef);
-}
+// ─────────────────────────────────────────────────────────────────
+// Architecture hybride :
+//   • Métadonnées (noms, dimensions, types…) → Firestore (cloud, rapide)
+//   • Binaires (PDFs, photos en base64)       → IndexedDB (local, instantané)
+// Les PDFs et photos ne quittent pas le navigateur — pas besoin de Storage.
+// ─────────────────────────────────────────────────────────────────
 
 // ── TISSUS ───────────────────────────────────────────────────────
 
+type FabricMeta = Omit<Fabric, 'photos'> & { photoCount: number };
+
 export async function loadFabricsDB(uid: string): Promise<Fabric[]> {
   const snap = await getDocs(collection(db, 'users', uid, 'fabrics'));
-  return snap.docs.map(d => d.data() as Fabric);
+  const metas = snap.docs.map(d => d.data() as FabricMeta);
+
+  return Promise.all(metas.map(async meta => {
+    const photos = await loadBinaryIDB<string[]>(`fabric_photos_${meta.id}`);
+    return { ...meta, photos: photos ?? [] } as Fabric;
+  }));
 }
 
 export async function saveFabricDB(uid: string, fabric: Fabric): Promise<Fabric> {
-  const photos = await Promise.all(
-    fabric.photos.map((p, i) =>
-      uploadIfNeeded(`users/${uid}/fabrics/${fabric.id}/p${i}`, p),
-    ),
-  );
-  const toSave: Fabric = { ...fabric, photos };
-  await setDoc(doc(db, 'users', uid, 'fabrics', fabric.id), toSave);
-  return toSave;
+  // Photos → IndexedDB
+  await saveBinaryIDB(`fabric_photos_${fabric.id}`, fabric.photos);
+
+  // Métadonnées sans les photos → Firestore
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { photos: _photos, ...rest } = fabric;
+  const meta: FabricMeta = { ...rest, photoCount: fabric.photos.length };
+  await setDoc(doc(db, 'users', uid, 'fabrics', fabric.id), meta);
+
+  return fabric;
 }
 
 export async function deleteFabricDB(uid: string, id: string): Promise<void> {
   await deleteDoc(doc(db, 'users', uid, 'fabrics', id));
+  // Les photos IDB restent (pas critique, petites clés)
 }
 
 // ── PATRONS ──────────────────────────────────────────────────────
 
+type PdfFileMeta = { name: string };
+type PatternMeta = Omit<Pattern, 'pdfFiles' | 'pdfDataUrl'> & { pdfFileNames: PdfFileMeta[] };
+
 export async function loadPatternsDB(uid: string): Promise<Pattern[]> {
   const snap = await getDocs(collection(db, 'users', uid, 'patterns'));
-  return snap.docs.map(d => d.data() as Pattern);
+  const metas = snap.docs.map(d => d.data() as PatternMeta);
+
+  return Promise.all(metas.map(async meta => {
+    const pdfFiles = await loadBinaryIDB<PatternFile[]>(`pattern_pdfs_${meta.id}`);
+    const { pdfFileNames: _names, ...rest } = meta;
+    return { ...rest, pdfFiles: pdfFiles ?? [] } as Pattern;
+  }));
 }
 
 export async function savePatternDB(uid: string, pattern: Pattern): Promise<Pattern> {
-  const pdfFiles = await Promise.all(
-    (pattern.pdfFiles ?? []).map(async (f, i) => ({
-      name: f.name,
-      dataUrl: await uploadIfNeeded(
-        `users/${uid}/patterns/${pattern.id}/f${i}`,
-        f.dataUrl,
-      ),
-    })),
-  );
-  // Supprimer le champ legacy avant de sauvegarder
+  // PDFs complets → IndexedDB
+  await saveBinaryIDB(`pattern_pdfs_${pattern.id}`, pattern.pdfFiles ?? []);
+
+  // Métadonnées sans les dataUrls → Firestore
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { pdfDataUrl: _legacy, ...rest } = pattern;
-  const toSave: Pattern = { ...rest, pdfFiles };
-  await setDoc(doc(db, 'users', uid, 'patterns', pattern.id), toSave);
-  return toSave;
+  const { pdfFiles, pdfDataUrl: _legacy, ...rest } = pattern;
+  const meta: PatternMeta = {
+    ...rest,
+    pdfFileNames: (pdfFiles ?? []).map(f => ({ name: f.name })),
+  };
+  await setDoc(doc(db, 'users', uid, 'patterns', pattern.id), meta);
+
+  return pattern;
 }
 
 export async function deletePatternDB(uid: string, id: string): Promise<void> {
@@ -73,35 +82,47 @@ export async function deletePatternDB(uid: string, id: string): Promise<void> {
 
 // ── PROJETS ──────────────────────────────────────────────────────
 
+type ProjectMeta = Omit<Project, 'photos'> & { photoCount: number };
+
 export async function loadProjectsDB(uid: string): Promise<Project[]> {
   const snap = await getDocs(collection(db, 'users', uid, 'projects'));
-  return snap.docs.map(d => d.data() as Project);
+  const metas = snap.docs.map(d => d.data() as ProjectMeta);
+
+  return Promise.all(metas.map(async meta => {
+    const photos = await loadBinaryIDB<string[]>(`project_photos_${meta.id}`);
+    return { ...meta, photos: photos ?? [] } as Project;
+  }));
 }
 
 export async function saveProjectDB(uid: string, project: Project): Promise<Project> {
-  const photos = await Promise.all(
-    project.photos.map((p, i) =>
-      uploadIfNeeded(`users/${uid}/projects/${project.id}/p${i}`, p),
-    ),
-  );
-  const toSave: Project = { ...project, photos };
-  await setDoc(doc(db, 'users', uid, 'projects', project.id), toSave);
-  return toSave;
+  await saveBinaryIDB(`project_photos_${project.id}`, project.photos);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { photos: _photos, ...rest } = project;
+  const meta: ProjectMeta = { ...rest, photoCount: project.photos.length };
+  await setDoc(doc(db, 'users', uid, 'projects', project.id), meta);
+  return project;
 }
 
 export async function deleteProjectDB(uid: string, id: string): Promise<void> {
   await deleteDoc(doc(db, 'users', uid, 'projects', id));
 }
 
-// ── PARTAGE (section commune à tous les profils) ──────────────────
+// ── PARTAGE (commun à tous les profils) ──────────────────────────
 
 export type SharedCreation = Creation & { userId: string; username: string };
 
+type SharedCreationMeta = Omit<SharedCreation, 'photos'> & { photoCount: number };
+
 export async function loadSharedCreationsDB(): Promise<SharedCreation[]> {
   const snap = await getDocs(collection(db, 'shared_creations'));
-  return snap.docs
-    .map(d => d.data() as SharedCreation)
-    .sort((a, b) => b.startedAt.localeCompare(a.startedAt));
+  const metas = snap.docs.map(d => d.data() as SharedCreationMeta);
+
+  const items = await Promise.all(metas.map(async meta => {
+    const photos = await loadBinaryIDB<string[]>(`shared_photos_${meta.id}`);
+    return { ...meta, photos: photos ?? [] } as SharedCreation;
+  }));
+
+  return items.sort((a, b) => b.startedAt.localeCompare(a.startedAt));
 }
 
 export async function saveSharedCreationDB(
@@ -109,14 +130,12 @@ export async function saveSharedCreationDB(
   username: string,
   creation: Creation,
 ): Promise<SharedCreation> {
-  const photos = await Promise.all(
-    creation.photos.map((p, i) =>
-      uploadIfNeeded(`shared/${creation.id}/p${i}`, p),
-    ),
-  );
-  const toSave: SharedCreation = { ...creation, photos, userId: uid, username };
-  await setDoc(doc(db, 'shared_creations', creation.id), toSave);
-  return toSave;
+  await saveBinaryIDB(`shared_photos_${creation.id}`, creation.photos);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { photos: _photos, ...rest } = creation;
+  const meta: SharedCreationMeta = { ...rest, photoCount: creation.photos.length, userId: uid, username };
+  await setDoc(doc(db, 'shared_creations', creation.id), meta);
+  return { ...creation, userId: uid, username };
 }
 
 export async function deleteSharedCreationDB(id: string): Promise<void> {
