@@ -28,6 +28,25 @@ function compressImage(dataUrl: string): Promise<string> {
 
 const FABRIC_TYPES = ['coton', 'lin', 'jersey', 'soie', 'laine', 'viscose', 'dentelle', 'velours', 'satin', 'mousseline', 'tweed', 'chambray', 'canvas', 'autres'];
 
+function loadFabricTypes(): string[] {
+  try {
+    const custom = JSON.parse(localStorage.getItem('custom_fabric_types') ?? '[]') as string[];
+    const merged = [...FABRIC_TYPES];
+    for (const t of custom) if (!merged.includes(t)) merged.push(t);
+    return merged;
+  } catch { return FABRIC_TYPES; }
+}
+
+function saveFabricType(type: string): void {
+  if (FABRIC_TYPES.includes(type)) return;
+  try {
+    const custom = JSON.parse(localStorage.getItem('custom_fabric_types') ?? '[]') as string[];
+    if (!custom.includes(type)) {
+      localStorage.setItem('custom_fabric_types', JSON.stringify([...custom, type]));
+    }
+  } catch { /* ignore */ }
+}
+
 export default function FabricForm({ onSubmit, onCancel, initialValues }: FabricFormProps) {
   const iv = initialValues;
   const isEdit = !!iv;
@@ -37,6 +56,7 @@ export default function FabricForm({ onSubmit, onCancel, initialValues }: Fabric
   const [colorName,      setColorName]      = useState('');
   const [detectingColor, setDetectingColor] = useState(false);
   const [type,           setType]           = useState(iv?.type          ?? '');
+  const [fabricTypes,    setFabricTypes]    = useState<string[]>(loadFabricTypes);
   const [pattern,        setPattern]        = useState(iv?.pattern       ?? '');
   const [notes,          setNotes]          = useState(iv?.notes         ?? '');
   const [unit,           setUnit]           = useState<'cm' | 'inch'>('cm');
@@ -102,6 +122,10 @@ export default function FabricForm({ onSubmit, onCancel, initialValues }: Fabric
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (type.trim()) {
+      saveFabricType(type.trim());
+      setFabricTypes(loadFabricTypes);
+    }
 
     let w = parseFloat(width) || 0;
     let l = 0;
@@ -136,7 +160,7 @@ export default function FabricForm({ onSubmit, onCancel, initialValues }: Fabric
 
       <div style={{ ...row2, marginBottom: '14px' }}>
         <div>
-          <label className="field-label">Nom *</label>
+          <label className="field-label">Nom / Référence *</label>
           <input className="field-input" required value={name}
             onChange={e => setName(e.target.value)} placeholder="Ex : Lin bleu ardoise" />
         </div>
@@ -146,7 +170,7 @@ export default function FabricForm({ onSubmit, onCancel, initialValues }: Fabric
           <input className="field-input" list="fabric-types-list" value={type}
             onChange={e => setType(e.target.value)} placeholder="Ex : coton, lin, jersey…" />
           <datalist id="fabric-types-list">
-            {FABRIC_TYPES.map(t => <option key={t} value={t} />)}
+            {fabricTypes.map(t => <option key={t} value={t} />)}
           </datalist>
         </div>
 

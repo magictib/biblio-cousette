@@ -12,6 +12,25 @@ interface PatternFormProps {
 
 const CLOTHING_TYPES = ['robe', 't-shirt', 'pull', 'blouse', 'pantalon', 'jupe', 'veste', 'manteau', 'combinaison', 'sweat', 'chemise', 'accessoire', 'sous-vêtement', 'pyjama', 'robe de chambre', 'maillot', 'autres'];
 
+function loadClothingTypes(): string[] {
+  try {
+    const custom = JSON.parse(localStorage.getItem('custom_clothing_types') ?? '[]') as string[];
+    const merged = [...CLOTHING_TYPES];
+    for (const t of custom) if (!merged.includes(t)) merged.push(t);
+    return merged;
+  } catch { return CLOTHING_TYPES; }
+}
+
+function saveClothingType(type: string): void {
+  if (CLOTHING_TYPES.includes(type)) return;
+  try {
+    const custom = JSON.parse(localStorage.getItem('custom_clothing_types') ?? '[]') as string[];
+    if (!custom.includes(type)) {
+      localStorage.setItem('custom_clothing_types', JSON.stringify([...custom, type]));
+    }
+  } catch { /* ignore */ }
+}
+
 export default function PatternForm({ onSubmit, onCancel, initialValues }: PatternFormProps) {
   const iv = initialValues;
   const isEdit = !!iv;
@@ -19,6 +38,7 @@ export default function PatternForm({ onSubmit, onCancel, initialValues }: Patte
   const [name,            setName]            = useState(iv?.name         ?? '');
   const [designer,        setDesigner]        = useState(iv?.designer     ?? '');
   const [clothingType,    setClothingType]    = useState(iv?.clothingType ?? 'robe');
+  const [clothingTypes,   setClothingTypes]   = useState<string[]>(loadClothingTypes);
   const [difficulty,      setDifficulty]      = useState<Pattern['difficulty']>(iv?.difficulty ?? 'moyen');
   const [width,           setWidth]           = useState(iv?.width  ? String(Math.round(iv.width))  : '60');
   const [height,          setHeight]          = useState(iv?.height ? String(Math.round(iv.height)) : '80');
@@ -69,6 +89,10 @@ export default function PatternForm({ onSubmit, onCancel, initialValues }: Patte
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (clothingType.trim()) {
+      saveClothingType(clothingType.trim());
+      setClothingTypes(loadClothingTypes);
+    }
     const factor = unit === 'inch' ? 2.54 : 1;
     onSubmit({
       name,
@@ -127,7 +151,7 @@ export default function PatternForm({ onSubmit, onCancel, initialValues }: Patte
             <label className="field-label">Type de vêtement</label>
             <input className="field-input" list="clothing-types-list" value={clothingType} onChange={e => setClothingType(e.target.value)} placeholder="Ex : robe, blouse, pantalon…" />
             <datalist id="clothing-types-list">
-              {CLOTHING_TYPES.map(t => <option key={t} value={t} />)}
+              {clothingTypes.map(t => <option key={t} value={t} />)}
             </datalist>
           </div>
 
