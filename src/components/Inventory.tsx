@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Fabric, Pattern } from '@/types';
 import { loadFabrics, loadPatterns } from '@/utils/migrate';
+import { loadFabricsIDB, saveFabricsIDB, loadPatternsIDB, savePatternsIDB } from '@/utils/idb';
 import FabricForm from './FabricForm';
 import PatternForm from './PatternForm';
 import FabricList from './FabricList';
@@ -15,14 +16,42 @@ export default function Inventory() {
   const [showForm,       setShowForm]       = useState(false);
   const [editingFabric,  setEditingFabric]  = useState<Fabric  | null>(null);
   const [editingPattern, setEditingPattern] = useState<Pattern | null>(null);
+  const loadedRef = useRef(false);
 
   useEffect(() => {
-    setFabrics(loadFabrics());
-    setPatterns(loadPatterns());
+    (async () => {
+      try {
+        const [dbF, dbP] = await Promise.all([loadFabricsIDB(), loadPatternsIDB()]);
+        if (dbF.length > 0 || dbP.length > 0) {
+          setFabrics(dbF);
+          setPatterns(dbP);
+        } else {
+          // First run: migrate from localStorage
+          const lsF = loadFabrics();
+          const lsP = loadPatterns();
+          setFabrics(lsF);
+          setPatterns(lsP);
+          if (lsF.length > 0) await saveFabricsIDB(lsF).catch(() => null);
+          if (lsP.length > 0) await savePatternsIDB(lsP).catch(() => null);
+        }
+      } catch {
+        setFabrics(loadFabrics());
+        setPatterns(loadPatterns());
+      } finally {
+        loadedRef.current = true;
+      }
+    })();
   }, []);
 
-  useEffect(() => { localStorage.setItem('fabrics',  JSON.stringify(fabrics));  }, [fabrics]);
-  useEffect(() => { localStorage.setItem('patterns', JSON.stringify(patterns)); }, [patterns]);
+  useEffect(() => {
+    if (!loadedRef.current) return;
+    saveFabricsIDB(fabrics).catch(() => null);
+  }, [fabrics]);
+
+  useEffect(() => {
+    if (!loadedRef.current) return;
+    savePatternsIDB(patterns).catch(() => null);
+  }, [patterns]);
 
   /* ── Tissus ──────────────────────────────────────────────────── */
   const handleFabricSubmit = (data: Omit<Fabric, 'id'>) => {

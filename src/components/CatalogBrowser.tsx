@@ -88,13 +88,14 @@ export default function CatalogBrowser({ onSelect, onAddPattern, onClose }: Cata
         const dataUrl = await readAsDataUrl(file);
         const nameWithoutExt = file.name.replace(/\.[^.]+$/, '');
         const pattern: Omit<Pattern, 'id'> = {
-          name:         nameWithoutExt,
-          designer:     undefined,
-          clothingType: 'autres',
-          difficulty:   'moyen',
-          width:        0,
-          height:       0,
-          pdfDataUrl:   dataUrl,
+          name:            nameWithoutExt,
+          designer:        undefined,
+          clothingType:    'autres',
+          difficulty:      'moyen',
+          width:           0,
+          height:          0,
+          pdfFiles:        [{ name: nameWithoutExt, dataUrl }],
+          primaryPdfIndex: 0,
         };
         if (onAddPattern) {
           onAddPattern(pattern);

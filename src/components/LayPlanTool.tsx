@@ -2,9 +2,10 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Fabric, Pattern } from '@/types';
-import { loadFabrics, loadPatterns } from '@/utils/migrate';
+import { loadFabrics } from '@/utils/migrate';
+import { loadPatternsIDB } from '@/utils/idb';
 import LayPlanCanvas, { PatternPiece, FabricConstraints, computeLayPlan } from './LayPlanCanvas';
-import { analyzePatternGPT, getOpenAIKey, setOpenAIKey } from '@/utils/openai';
+import type { PatternPieceRaw } from '@/utils/openai';
 
 const EMPTY_PIECE = (): PatternPiece => ({
   name: '', widthCm: 0, heightCm: 0, quantity: 1, onFold: false,
@@ -55,19 +56,11 @@ export default function LayPlanTool() {
   const [analysisStatus, setAnalysisStatus] = useState<AnalysisStatus>('idle');
   const [analysisError,  setAnalysisError]  = useState('');
 
-  /* Clé OpenAI */
-  const [keyInput,    setKeyInput]    = useState('');
-  const [showKeyEdit, setShowKeyEdit] = useState(false);
-  const [keyStored,   setKeyStored]   = useState(false);
-
   const imageRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setFabrics(loadFabrics());
-    setPatterns(loadPatterns());
-    const k = getOpenAIKey();
-    setKeyStored(!!k);
-    setKeyInput(k);
+    loadPatternsIDB().then(setPatterns).catch(() => null);
   }, []);
 
   useEffect(() => {
@@ -88,12 +81,6 @@ export default function LayPlanTool() {
   const addPiece    = () => setPieces(prev => [...prev, EMPTY_PIECE()]);
   const removePiece = (idx: number) => setPieces(prev => prev.filter((_, i) => i !== idx));
 
-  const saveKey = () => {
-    setOpenAIKey(keyInput);
-    setKeyStored(!!keyInput.trim());
-    setShowKeyEdit(false);
-  };
-
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -108,17 +95,23 @@ export default function LayPlanTool() {
     setAnalysisStatus('loading');
     setAnalysisError('');
     try {
-      const data = await analyzePatternGPT({
-        imageDataUrl:    analysisImage ?? undefined,
-        fabricWidthCm:   selectedFabric.width,
-        fabricLengthM:   selectedFabric.length,
-        size,
-        version:         version       || undefined,
-        garmentSubtype:  garmentSubtype || undefined,
-        stretchDirection: stretchDir   || undefined,
+      const res = await fetch('/api/analyze-pattern-gpt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          imageDataUrl:     analysisImage ?? undefined,
+          fabricWidthCm:    selectedFabric.width,
+          fabricLengthM:    selectedFabric.length,
+          size,
+          version:          version        || undefined,
+          garmentSubtype:   garmentSubtype || undefined,
+          stretchDirection: stretchDir     || undefined,
+        }),
       });
-      if (data.pieces.length > 0) {
-        setPieces(data.pieces.map(p => ({
+      const data = await res.json() as { garment_type?: string; pieces?: PatternPieceRaw[]; error?: string };
+      if (!res.ok || data.error) throw new Error(data.error ?? `HTTP ${res.status}`);
+      if ((data.pieces ?? []).length > 0) {
+        setPieces((data.pieces ?? []).map((p: PatternPieceRaw) => ({
           name:          p.name,
           widthCm:       p.width_cm,
           heightCm:      p.height_cm,
@@ -142,7 +135,7 @@ export default function LayPlanTool() {
 
   const validPieces  = pieces.filter(p => p.name && p.widthCm > 0 && p.heightCm > 0);
   const canGenerate  = validPieces.length > 0 && !!selectedFabric;
-  const canAnalyze   = !!selectedFabric && keyStored;
+  const canAnalyze   = !!selectedFabric;
   const hasRepeatActive = showRepeat && (parseFloat(repeatH) > 0 || parseFloat(repeatV) > 0);
 
   return (
@@ -240,27 +233,9 @@ export default function LayPlanTool() {
 
           {/* ── Analyse GPT-4o ─────────────────────────────────── */}
           <Panel>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-              <p style={{ fontFamily: 'Georgia, serif', fontWeight: 'bold', color: 'var(--brun)', fontSize: '0.9rem', margin: 0 }}>
-                Analyse GPT-4o
-              </p>
-              <button type="button" onClick={() => setShowKeyEdit(v => !v)}
-                style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: '8px', border: `1px solid ${keyStored ? '#80C894' : 'var(--mauve-pale)'}`, backgroundColor: keyStored ? '#E8F5EC' : 'transparent', color: keyStored ? '#2E7A46' : 'var(--brun-mid)', cursor: 'pointer', fontFamily: 'Georgia, serif' }}>
-                {keyStored ? '✓ Clé configurée' : '⚙ Configurer clé'}
-              </button>
-            </div>
-
-            {/* Saisie de la clé */}
-            {showKeyEdit && (
-              <div style={{ marginBottom: '12px', padding: '10px', backgroundColor: 'rgba(94,53,120,.06)', borderRadius: '7px', border: '1px dashed var(--mauve-pale)' }}>
-                <label style={{ fontSize: '0.7rem', color: 'var(--brun-mid)', display: 'block', marginBottom: '4px' }}>Clé API OpenAI (sk-…)</label>
-                <div style={{ display: 'flex', gap: '6px' }}>
-                  <input type="password" value={keyInput} onChange={e => setKeyInput(e.target.value)}
-                    className="field-input" placeholder="sk-..." style={{ flex: 1, fontSize: '0.82rem', padding: '6px 8px' }} />
-                  <button type="button" onClick={saveKey} className="btn-sage" style={{ padding: '6px 12px', fontSize: '0.8rem' }}>✓</button>
-                </div>
-              </div>
-            )}
+            <p style={{ fontFamily: 'Georgia, serif', fontWeight: 'bold', color: 'var(--brun)', fontSize: '0.9rem', margin: '0 0 12px' }}>
+              Analyse GPT-4o
+            </p>
 
             {/* Patron */}
             <div style={{ marginBottom: '10px' }}>
@@ -357,12 +332,7 @@ export default function LayPlanTool() {
               style={{ width: '100%', justifyContent: 'center', fontSize: '0.88rem', padding: '9px', opacity: (canAnalyze && analysisStatus !== 'loading') ? 1 : 0.5, cursor: (canAnalyze && analysisStatus !== 'loading') ? 'pointer' : 'not-allowed' }}>
               {analysisStatus === 'loading' ? '⏳ Analyse en cours…' : '✦ Analyser avec GPT-4o'}
             </button>
-            {!keyStored && (
-              <p style={{ fontSize: '0.7rem', color: 'var(--brun-mid)', fontStyle: 'italic', textAlign: 'center', marginTop: '5px' }}>
-                Configurez votre clé OpenAI pour utiliser cette fonctionnalité.
-              </p>
-            )}
-            {keyStored && !selectedFabric && (
+            {!selectedFabric && (
               <p style={{ fontSize: '0.7rem', color: 'var(--brun-mid)', fontStyle: 'italic', textAlign: 'center', marginTop: '5px' }}>
                 Sélectionnez d&apos;abord un tissu.
               </p>
