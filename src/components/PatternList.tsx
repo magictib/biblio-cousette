@@ -1,7 +1,26 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Pattern } from '@/types';
+
+function usePdfBlobUrl(dataUrl: string | undefined): string | null {
+  const [url, setUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!dataUrl?.startsWith('data:application/pdf')) { setUrl(null); return; }
+    const [header, b64] = dataUrl.split(',');
+    const mime = header.match(/:(.*?);/)?.[1] ?? 'application/pdf';
+    const bytes = atob(b64);
+    const buf = new Uint8Array(bytes.length);
+    for (let i = 0; i < bytes.length; i++) buf[i] = bytes.charCodeAt(i);
+    const blob = new Blob([buf], { type: mime });
+    const blobUrl = URL.createObjectURL(blob);
+    setUrl(blobUrl);
+    return () => URL.revokeObjectURL(blobUrl);
+  }, [dataUrl]);
+
+  return url;
+}
 
 interface PatternListProps {
   patterns: Pattern[];
@@ -18,6 +37,8 @@ const diffStyle: Record<string, { bg: string; color: string; border: string }> =
 
 export default function PatternList({ patterns, onDelete, onEdit, onSetPrimaryPdf }: PatternListProps) {
   const [preview, setPreview] = useState<{ pattern: Pattern; fileIdx: number } | null>(null);
+  const currentFile = preview?.pattern.pdfFiles?.[preview.fileIdx] ?? null;
+  const pdfBlobUrl  = usePdfBlobUrl(currentFile?.dataUrl);
 
   if (patterns.length === 0) {
     return (
@@ -31,8 +52,6 @@ export default function PatternList({ patterns, onDelete, onEdit, onSetPrimaryPd
   const openPreview = (pattern: Pattern) => {
     setPreview({ pattern, fileIdx: pattern.primaryPdfIndex ?? 0 });
   };
-
-  const currentFile = preview?.pattern.pdfFiles?.[preview.fileIdx] ?? null;
 
   return (
     <>
@@ -107,7 +126,9 @@ export default function PatternList({ patterns, onDelete, onEdit, onSetPrimaryPd
               {/* Viewer */}
               <div style={{ flex: 1, overflow: 'auto', padding: '16px', minHeight: 0 }}>
                 {currentFile.dataUrl.startsWith('data:application/pdf') ? (
-                  <iframe src={currentFile.dataUrl} style={{ width: '100%', height: '70vh', border: 'none', borderRadius: '6px' }} title={currentFile.name} />
+                  pdfBlobUrl
+                    ? <iframe src={pdfBlobUrl} style={{ width: '100%', height: '70vh', border: 'none', borderRadius: '6px' }} title={currentFile.name} />
+                    : <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '70vh', color: 'var(--brun-mid)', fontStyle: 'italic', fontFamily: 'Georgia, serif' }}>Chargement…</div>
                 ) : (
                   <img src={currentFile.dataUrl} alt={currentFile.name}
                     style={{ maxWidth: '100%', maxHeight: '70vh', display: 'block', margin: '0 auto', borderRadius: '6px', border: '1.5px solid var(--mauve-pale)' }} />
