@@ -11,7 +11,11 @@ export interface AuthUser {
   firebaseUser: User;
 }
 
-export function useAuth(): { authUser: AuthUser | null; loading: boolean } {
+export function useAuth(): {
+  authUser: AuthUser | null;
+  loading: boolean;
+  setUsername: (name: string) => void;
+} {
   const [authUser, setAuthUser] = useState<AuthUser | null>(null);
   const [loading,  setLoading]  = useState(true);
 
@@ -28,5 +32,9 @@ export function useAuth(): { authUser: AuthUser | null; loading: boolean } {
     return unsub;
   }, []);
 
-  return { authUser, loading };
+  const setUsername = (name: string) => {
+    setAuthUser(prev => prev ? { ...prev, username: name } : null);
+  };
+
+  return { authUser, loading, setUsername };
 }

@@ -6,6 +6,7 @@ import ProjectGallery from '@/components/ProjectGallery';
 import LayPlanTool from '@/components/LayPlanTool';
 import CreationShare from '@/components/CreationShare';
 import AuthGate from '@/components/AuthGate';
+import AccountSettings from '@/components/AccountSettings';
 import { useAuth } from '@/hooks/useAuth';
 import { signOut } from '@/lib/auth';
 
@@ -75,8 +76,9 @@ function NavIcon({ id, active }: { id: Tab; active: boolean }) {
 }
 
 export default function Home() {
-  const { authUser, loading } = useAuth();
-  const [activeTab, setActiveTab] = useState<Tab>('inventory');
+  const { authUser, loading, setUsername } = useAuth();
+  const [activeTab,       setActiveTab]       = useState<Tab>('inventory');
+  const [showAccountSettings, setShowAccountSettings] = useState(false);
 
   if (loading) {
     return (
@@ -107,6 +109,16 @@ export default function Home() {
           🧶 <strong>{username}</strong>
         </span>
         <button
+          onClick={() => setShowAccountSettings(true)}
+          style={{
+            padding: '4px 12px', borderRadius: '6px', border: '1.5px solid var(--mauve-light)',
+            backgroundColor: 'var(--creme)', color: 'var(--mauve)',
+            cursor: 'pointer', fontFamily: 'Georgia, serif', fontSize: '0.78rem',
+          }}
+        >
+          ⚙ Mon compte
+        </button>
+        <button
           onClick={() => signOut()}
           style={{
             padding: '4px 12px', borderRadius: '6px', border: '1.5px solid var(--mauve-light)',
@@ -117,6 +129,15 @@ export default function Home() {
           Déconnexion
         </button>
       </div>
+
+      {showAccountSettings && (
+        <AccountSettings
+          user={authUser.firebaseUser}
+          username={username}
+          onUsernameChanged={newName => { setUsername(newName); setShowAccountSettings(false); }}
+          onClose={() => setShowAccountSettings(false)}
+        />
+      )}
 
       {/* ── Navigation mobile ─────────────────────────────────────── */}
       <nav className="md:hidden" style={{ marginBottom: '20px' }}>

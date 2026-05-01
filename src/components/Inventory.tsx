@@ -1,9 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Fabric, Pattern } from '@/types';
-import { loadFabrics, loadPatterns } from '@/utils/migrate';
-import { loadFabricsIDB, loadPatternsIDB } from '@/utils/idb';
 import { loadFabricsDB, saveFabricDB, deleteFabricDB, loadPatternsDB, savePatternDB, deletePatternDB } from '@/lib/db';
 import FabricForm from './FabricForm';
 import PatternForm from './PatternForm';
@@ -22,59 +20,12 @@ export default function Inventory({ uid }: Props) {
   const [saving,         setSaving]         = useState(false);
   const [saveError,      setSaveError]      = useState('');
 
-  /* Import depuis les données locales */
-  const [localFabrics,   setLocalFabrics]   = useState<Fabric[]>([]);
-  const [localPatterns,  setLocalPatterns]  = useState<Pattern[]>([]);
-  const [migrating,      setMigrating]      = useState(false);
-  const [migrateError,   setMigrateError]   = useState('');
-  const [showMigration,  setShowMigration]  = useState(false);
-  const loadedRef = useRef(false);
-
   /* ── Chargement initial depuis Firestore ─────────────────────── */
   useEffect(() => {
-    (async () => {
-      try {
-        const [dbF, dbP] = await Promise.all([loadFabricsDB(uid), loadPatternsDB(uid)]);
-        setFabrics(dbF);
-        setPatterns(dbP);
-
-        if (dbF.length === 0 && dbP.length === 0) {
-          // Vérifier si des données locales existent
-          const idbF = await loadFabricsIDB().catch(() => []);
-          const idbP = await loadPatternsIDB().catch(() => []);
-          const lsF  = idbF.length > 0 ? idbF : loadFabrics();
-          const lsP  = idbP.length > 0 ? idbP : loadPatterns();
-          if (lsF.length > 0 || lsP.length > 0) {
-            setLocalFabrics(lsF);
-            setLocalPatterns(lsP);
-            setShowMigration(true);
-          }
-        }
-      } catch (err) {
-        console.error('Erreur chargement Firestore', err);
-      } finally {
-        loadedRef.current = true;
-      }
-    })();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    Promise.all([loadFabricsDB(uid), loadPatternsDB(uid)])
+      .then(([f, p]) => { setFabrics(f); setPatterns(p); })
+      .catch(err => console.error('Erreur chargement', err));
   }, [uid]);
-
-  /* ── Migration données locales → Firestore ───────────────────── */
-  const handleMigrate = async () => {
-    setMigrating(true);
-    setMigrateError('');
-    try {
-      const savedF = await Promise.all(localFabrics.map(f => saveFabricDB(uid, f)));
-      const savedP = await Promise.all(localPatterns.map(p => savePatternDB(uid, p)));
-      setFabrics(savedF);
-      setPatterns(savedP);
-      setShowMigration(false);
-    } catch (err) {
-      setMigrateError(String(err).replace('Error: ', ''));
-    } finally {
-      setMigrating(false);
-    }
-  };
 
   /* ── Tissus ──────────────────────────────────────────────────── */
   const handleFabricSubmit = async (data: Omit<Fabric, 'id'>) => {
@@ -182,30 +133,6 @@ export default function Inventory({ uid }: Props) {
           Gérez vos tissus et vos patrons
         </p>
       </div>
-
-      {/* ── Bannière migration données locales ──────────────────── */}
-      {showMigration && (
-        <div style={{
-          backgroundColor: '#FFF8E8', border: '1.5px solid #D4A830',
-          borderRadius: '8px', padding: '16px 20px', marginBottom: '20px',
-        }}>
-          <p style={{ margin: '0 0 10px', fontSize: '0.88rem', color: '#7A5010', fontFamily: 'Georgia, serif' }}>
-            📦 Des données locales ont été trouvées ({localFabrics.length} tissu{localFabrics.length !== 1 ? 's' : ''}, {localPatterns.length} patron{localPatterns.length !== 1 ? 's' : ''}).
-            Voulez-vous les importer dans votre profil ?
-          </p>
-          {migrateError && (
-            <p style={{ color: '#943030', fontSize: '0.8rem', margin: '0 0 8px' }}>⚠️ {migrateError}</p>
-          )}
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <button onClick={handleMigrate} disabled={migrating} className="btn-sage" style={{ fontSize: '0.85rem' }}>
-              {migrating ? '⏳ Import en cours…' : '↑ Importer mes données locales'}
-            </button>
-            <button onClick={() => setShowMigration(false)} style={{ padding: '7px 14px', borderRadius: '6px', border: '1.5px solid #D4A830', backgroundColor: 'transparent', color: '#7A5010', cursor: 'pointer', fontFamily: 'Georgia, serif', fontSize: '0.85rem' }}>
-              Ignorer
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* ── Erreur de sauvegarde ─────────────────────────────────── */}
       {saveError && (
