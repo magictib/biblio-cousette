@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --linen:        #EAE0F0;
-  --creme:        #F4EEF9;
+  --linen:        #C8E8F8;
+  --creme:        #E2F4FF;
   --mauve:        #5E3578;
   --mauve-light:  #9E6EBE;
   --mauve-pale:   #D8C4EC;
@@ -21,7 +21,7 @@
 }
 
 body {
-  background-color: var(--linen);
+  background-color: #EAE0F0;
   color: var(--brun);
   font-family: Georgia, 'Times New Roman', serif;
   /* Texture : papier patron de couture (grille légère) */
@@ -29,12 +29,12 @@ body {
     repeating-linear-gradient(
       0deg,
       transparent, transparent 31px,
-      rgba(196, 136, 154, 0.07) 31px, rgba(196, 136, 154, 0.07) 32px
+      rgba(94, 53, 120, 0.07) 31px, rgba(94, 53, 120, 0.07) 32px
     ),
     repeating-linear-gradient(
       90deg,
       transparent, transparent 31px,
-      rgba(196, 136, 154, 0.07) 31px, rgba(196, 136, 154, 0.07) 32px
+      rgba(94, 53, 120, 0.07) 31px, rgba(94, 53, 120, 0.07) 32px
     );
 }
 
