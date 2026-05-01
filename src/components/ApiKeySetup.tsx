@@ -45,7 +45,7 @@ export default function ApiKeySetup() {
             color: hasKey ? '#2E7A46' : 'var(--mauve)',
             fontFamily: 'Georgia, serif',
           }}>
-          {hasKey ? '🔑 Clé IA configurée' : '⚠️ Configurer la clé IA'}
+          {hasKey ? '🔑 Clé configurée' : '⚠️ Configurer la clé'}
         </button>
       </div>
     );
@@ -62,10 +62,9 @@ export default function ApiKeySetup() {
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px' }}>
         <div style={{ flex: 1 }}>
           <p style={{ margin: '0 0 6px', fontFamily: 'Georgia, serif', fontWeight: 'bold', color: 'var(--mauve)', fontSize: '0.95rem' }}>
-            🔑 Clé Google Gemini (IA gratuite)
+            🔑 Clé Google Gemini
           </p>
           <p style={{ margin: '0 0 12px', fontSize: '0.78rem', color: 'var(--brun-mid)', lineHeight: 1.5 }}>
-            Nécessaire pour l'analyse de patrons, la détection de couleur et l'estimation de surface.{' '}
             Obtenez une clé gratuite sur{' '}
             <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer"
               style={{ color: 'var(--mauve)', fontWeight: 'bold' }}>

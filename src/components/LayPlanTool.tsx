@@ -148,7 +148,7 @@ export default function LayPlanTool({ uid }: Props) {
           Placement sur tissu
         </h3>
         <p style={{ color: 'var(--brun-mid)', fontSize: '0.85rem', margin: 0, fontStyle: 'italic' }}>
-          Estimez le métrage et visualisez la disposition des pièces. L&apos;IA GPT-4o peut remplir la liste automatiquement.
+          Estimez le métrage et visualisez la disposition des pièces de votre patron.
         </p>
       </div>
 
@@ -232,10 +232,10 @@ export default function LayPlanTool({ uid }: Props) {
             </div>
           </Panel>
 
-          {/* ── Analyse GPT-4o ─────────────────────────────────── */}
+          {/* ── Analyse automatique ────────────────────────────── */}
           <Panel>
             <p style={{ fontFamily: 'Georgia, serif', fontWeight: 'bold', color: 'var(--brun)', fontSize: '0.9rem', margin: '0 0 12px' }}>
-              Analyse GPT-4o
+              Remplissage automatique
             </p>
 
             {/* Patron */}
@@ -311,7 +311,7 @@ export default function LayPlanTool({ uid }: Props) {
                 )}
               </div>
               <p style={{ margin: '5px 0 0', fontSize: '0.68rem', color: 'var(--brun-mid)', fontStyle: 'italic' }}>
-                Images uniquement (PNG, JPG). GPT-4o analyse la photo du patron.
+                Images uniquement (PNG, JPG).
               </p>
             </div>
 
@@ -331,7 +331,7 @@ export default function LayPlanTool({ uid }: Props) {
               disabled={!canAnalyze || analysisStatus === 'loading'}
               className="btn-couture"
               style={{ width: '100%', justifyContent: 'center', fontSize: '0.88rem', padding: '9px', opacity: (canAnalyze && analysisStatus !== 'loading') ? 1 : 0.5, cursor: (canAnalyze && analysisStatus !== 'loading') ? 'pointer' : 'not-allowed' }}>
-              {analysisStatus === 'loading' ? '⏳ Analyse en cours…' : '✦ Analyser avec GPT-4o'}
+              {analysisStatus === 'loading' ? '⏳ Analyse en cours…' : '✦ Remplir automatiquement'}
             </button>
             {!selectedFabric && (
               <p style={{ fontSize: '0.7rem', color: 'var(--brun-mid)', fontStyle: 'italic', textAlign: 'center', marginTop: '5px' }}>
