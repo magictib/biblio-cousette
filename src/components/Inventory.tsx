@@ -7,6 +7,7 @@ import FabricForm from './FabricForm';
 import PatternForm from './PatternForm';
 import FabricList from './FabricList';
 import PatternList from './PatternList';
+import MondialTissusHelper from './MondialTissusHelper';
 
 interface Props { uid: string }
 
@@ -152,11 +153,19 @@ export default function Inventory({ uid }: Props) {
         </button>
       </div>
 
+      {/* ── Mondial Tissus Helper (onglet tissus uniquement) ─────── */}
+      {activeTab === 'fabrics' && !showForm && !isEditing && (
+        <MondialTissusHelper onAdd={async (data) => {
+          const created = await saveFabricDB(uid, { ...data, id: Date.now().toString() });
+          setFabrics(prev => [...prev, created]);
+        }} />
+      )}
+
       {/* ── Bouton Ajouter ────────────────────────────────────────── */}
       {showAddButton && (
         <div style={{ marginBottom: '24px' }}>
           <button onClick={handleToggleAdd} className={showForm ? 'btn-couture' : 'btn-sage'} disabled={saving}>
-            {showForm ? '✖ Annuler' : '＋ Ajouter'}
+            {showForm ? '✖ Annuler' : '＋ Ajouter manuellement'}
           </button>
         </div>
       )}
