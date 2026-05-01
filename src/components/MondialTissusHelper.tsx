@@ -56,8 +56,9 @@ export default function MondialTissusHelper({ onAdd }: Props) {
   const [added, setAdded] = useState('');
 
   const openSearch = () => {
-    const q = encodeURIComponent(search.trim() || 'tissu');
-    window.open(`https://www.mondialtissus.fr/recherche?q=${q}`, '_blank', 'noopener');
+    const base = 'https://www.mondialtissus.fr/tissus.html';
+    const url = search.trim() ? `${base}?q=${encodeURIComponent(search.trim())}` : base;
+    window.open(url, '_blank', 'noopener');
   };
 
   const handleAdd = (e: React.FormEvent) => {
