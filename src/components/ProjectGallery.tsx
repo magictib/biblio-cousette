@@ -2,94 +2,117 @@
 
 import { useState, useEffect } from 'react';
 import { Fabric, Pattern, Project } from '@/types';
+import { loadFabricsDB, loadPatternsDB, loadProjectsDB, saveProjectDB, deleteProjectDB } from '@/lib/db';
 import ProjectForm from './ProjectForm';
 import ProjectCard from './ProjectCard';
 
-export default function ProjectGallery() {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [fabrics, setFabrics] = useState<Fabric[]>([]);
-  const [patterns, setPatterns] = useState<Pattern[]>([]);
-  const [showForm, setShowForm] = useState(false);
+interface Props { uid: string }
 
-  // Charger les données
+export default function ProjectGallery({ uid }: Props) {
+  const [projects,  setProjects]  = useState<Project[]>([]);
+  const [fabrics,   setFabrics]   = useState<Fabric[]>([]);
+  const [patterns,  setPatterns]  = useState<Pattern[]>([]);
+  const [showForm,  setShowForm]  = useState(false);
+  const [saving,    setSaving]    = useState(false);
+  const [saveError, setSaveError] = useState('');
+
   useEffect(() => {
-    const savedProjects = localStorage.getItem('projects');
-    const savedFabrics = localStorage.getItem('fabrics');
-    const savedPatterns = localStorage.getItem('patterns');
+    Promise.all([
+      loadProjectsDB(uid),
+      loadFabricsDB(uid),
+      loadPatternsDB(uid),
+    ]).then(([p, f, pat]) => {
+      setProjects(p);
+      setFabrics(f);
+      setPatterns(pat);
+    }).catch(console.error);
+  }, [uid]);
 
-    if (savedProjects) setProjects(JSON.parse(savedProjects));
-    if (savedFabrics) setFabrics(JSON.parse(savedFabrics));
-    if (savedPatterns) setPatterns(JSON.parse(savedPatterns));
-  }, []);
-
-  // Sauvegarder les projets
-  useEffect(() => {
-    localStorage.setItem('projects', JSON.stringify(projects));
-  }, [projects]);
-
-  const addProject = (projectData: Omit<Project, 'id' | 'createdAt'>) => {
-    const newProject: Project = {
-      ...projectData,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString(),
-    };
-    setProjects([...projects, newProject]);
-    setShowForm(false);
+  const addProject = async (projectData: Omit<Project, 'id' | 'createdAt'>) => {
+    setSaving(true); setSaveError('');
+    try {
+      const created = await saveProjectDB(uid, {
+        ...projectData,
+        id: Date.now().toString(),
+        createdAt: new Date().toISOString(),
+      });
+      setProjects(prev => [...prev, created]);
+      setShowForm(false);
+    } catch (err) {
+      setSaveError(String(err).replace('Error: ', ''));
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const updateProject = (id: string, updatedData: Partial<Project>) => {
-    setProjects(
-      projects.map((p) => (p.id === id ? { ...p, ...updatedData } : p))
-    );
+  const updateProject = async (id: string, updatedData: Partial<Project>) => {
+    const project = projects.find(p => p.id === id);
+    if (!project) return;
+    try {
+      const updated = await saveProjectDB(uid, { ...project, ...updatedData });
+      setProjects(prev => prev.map(p => p.id === id ? updated : p));
+    } catch (err) {
+      setSaveError(String(err).replace('Error: ', ''));
+    }
   };
 
-  const deleteProject = (id: string) => {
-    setProjects(projects.filter((p) => p.id !== id));
+  const deleteProject = async (id: string) => {
+    try {
+      await deleteProjectDB(uid, id);
+      setProjects(prev => prev.filter(p => p.id !== id));
+    } catch (err) {
+      setSaveError(String(err).replace('Error: ', ''));
+    }
   };
 
-  const getFabricName = (fabricId: string) => {
-    return fabrics.find((f) => f.id === fabricId)?.name || 'Tissu inconnu';
-  };
-
-  const getPatternName = (patternId: string) => {
-    return patterns.find((p) => p.id === patternId)?.name || 'Patron inconnu';
-  };
+  const getFabricName  = (id: string) => fabrics.find(f => f.id === id)?.name  ?? 'Tissu inconnu';
+  const getPatternName = (id: string) => patterns.find(p => p.id === id)?.name ?? 'Patron inconnu';
 
   return (
-    <div className="p-6">
-      <div className="mb-8">
-        <h3 className="text-2xl font-bold text-gray-900 mb-4">📸 Mes Projets</h3>
-        <p className="text-gray-600 mb-6">
-          Suivez vos projets de couture avec des photos et un historique d'avancement
-        </p>
+    <div style={{ padding: '28px 28px 32px' }}>
 
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium"
-        >
-          {showForm ? '✖️ Annuler' : '➕ Nouveau Projet'}
+      <div style={{ marginBottom: '24px' }}>
+        <h3 style={{ color: 'var(--mauve)', fontFamily: 'Georgia, serif', fontSize: '1.4rem', fontWeight: 'bold', margin: '0 0 4px' }}>
+          Mes Projets
+        </h3>
+        <p style={{ color: 'var(--brun-mid)', fontSize: '0.85rem', margin: 0, fontStyle: 'italic' }}>
+          Suivez vos projets de couture avec photos et historique d&apos;avancement
+        </p>
+      </div>
+
+      {saveError && (
+        <div style={{ backgroundColor: '#FAE8E8', border: '1px solid #D48080', borderRadius: '6px', padding: '8px 12px', marginBottom: '14px', fontSize: '0.82rem', color: '#943030' }}>
+          ⚠️ {saveError}
+          <button onClick={() => setSaveError('')} style={{ background: 'none', border: 'none', cursor: 'pointer', marginLeft: '8px', color: '#943030' }}>✕</button>
+        </div>
+      )}
+
+      <div style={{ marginBottom: '24px' }}>
+        <button onClick={() => setShowForm(v => !v)} className={showForm ? 'btn-couture' : 'btn-sage'} disabled={saving}>
+          {showForm ? '✖ Annuler' : '➕ Nouveau projet'}
         </button>
       </div>
 
+      {saving && (
+        <div style={{ backgroundColor: 'var(--mauve-pale)', border: '1px solid var(--mauve-light)', borderRadius: '6px', padding: '8px 12px', marginBottom: '14px', fontSize: '0.82rem', color: 'var(--mauve)' }}>
+          ⏳ Enregistrement en cours…
+        </div>
+      )}
+
       {showForm && (
-        <div className="bg-gray-50 p-6 rounded-lg mb-6">
-          <ProjectForm
-            fabrics={fabrics}
-            patterns={patterns}
-            onSubmit={addProject}
-          />
+        <div style={{ backgroundColor: 'var(--linen)', border: '1.5px solid var(--mauve-pale)', borderRadius: '8px', padding: '24px', marginBottom: '24px' }}>
+          <ProjectForm fabrics={fabrics} patterns={patterns} onSubmit={addProject} />
         </div>
       )}
 
       {projects.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 rounded-lg">
-          <p className="text-gray-500 text-lg">
-            Aucun projet créé. Lancez votre première création!
-          </p>
+        <div style={{ textAlign: 'center', padding: '48px 24px', color: 'var(--brun-mid)', fontStyle: 'italic', fontFamily: 'Georgia, serif' }}>
+          <div style={{ fontSize: '2rem', marginBottom: '10px' }}>📸</div>
+          <p>Aucun projet créé. Lancez votre première création !</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {projects.map((project) => (
+          {projects.map(project => (
             <ProjectCard
               key={project.id}
               project={project}

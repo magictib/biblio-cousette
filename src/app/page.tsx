@@ -5,6 +5,9 @@ import Inventory from '@/components/Inventory';
 import ProjectGallery from '@/components/ProjectGallery';
 import LayPlanTool from '@/components/LayPlanTool';
 import CreationShare from '@/components/CreationShare';
+import AuthGate from '@/components/AuthGate';
+import { useAuth } from '@/hooks/useAuth';
+import { signOut } from '@/lib/auth';
 
 type Tab = 'inventory' | 'projects' | 'layplan' | 'partage';
 
@@ -72,10 +75,48 @@ function NavIcon({ id, active }: { id: Tab; active: boolean }) {
 }
 
 export default function Home() {
+  const { authUser, loading } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>('inventory');
+
+  if (loading) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--creme)' }}>
+        <div style={{ textAlign: 'center', color: 'var(--mauve)', fontFamily: 'Georgia, serif' }}>
+          <div style={{ fontSize: '2rem', marginBottom: '12px' }}>🧵</div>
+          <p style={{ fontSize: '0.9rem', fontStyle: 'italic' }}>Chargement…</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!authUser) return <AuthGate />;
+
+  const { uid, username } = authUser;
 
   return (
     <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '32px 20px' }}>
+
+      {/* ── Bandeau profil ────────────────────────────────────────── */}
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
+        gap: '12px', marginBottom: '16px',
+        padding: '8px 16px', backgroundColor: 'var(--mauve-pale)',
+        border: '1.5px solid var(--mauve-light)', borderRadius: '9px',
+      }}>
+        <span style={{ fontSize: '0.8rem', color: 'var(--mauve)', fontFamily: 'Georgia, serif' }}>
+          🧶 <strong>{username}</strong>
+        </span>
+        <button
+          onClick={() => signOut()}
+          style={{
+            padding: '4px 12px', borderRadius: '6px', border: '1.5px solid var(--mauve-light)',
+            backgroundColor: 'var(--creme)', color: 'var(--brun-mid)',
+            cursor: 'pointer', fontFamily: 'Georgia, serif', fontSize: '0.78rem',
+          }}
+        >
+          Déconnexion
+        </button>
+      </div>
 
       {/* ── Navigation mobile ─────────────────────────────────────── */}
       <nav className="md:hidden" style={{ marginBottom: '20px' }}>
@@ -111,7 +152,6 @@ export default function Home() {
           </p>
 
           <div style={{ position: 'relative' }}>
-            {/* Fil vertical */}
             <div style={{
               position: 'absolute', left: '12px', top: '12px', bottom: '12px', width: '2px',
               background: 'linear-gradient(180deg, var(--mauve-pale) 0%, var(--mauve-light) 25%, var(--mauve) 50%, var(--mauve-light) 75%, var(--mauve-pale) 100%)',
@@ -145,7 +185,6 @@ export default function Home() {
             })}
           </div>
 
-          {/* Pelote décorative */}
           <div style={{ marginTop: '12px', paddingLeft: '4px', opacity: 0.45 }}>
             <svg width="40" height="40" viewBox="0 0 48 48" fill="none">
               <circle cx="24" cy="28" r="14" fill="var(--mauve-pale)" stroke="var(--mauve-light)" strokeWidth="1.5"/>
@@ -156,13 +195,12 @@ export default function Home() {
           </div>
         </aside>
 
-        {/* Contenu */}
         <main style={{ flex: 1, minWidth: 0 }}>
           <div className="card-stitched">
-            {activeTab === 'inventory' && <Inventory />}
-            {activeTab === 'layplan'   && <LayPlanTool />}
-            {activeTab === 'projects'  && <ProjectGallery />}
-            {activeTab === 'partage'   && <CreationShare />}
+            {activeTab === 'inventory' && <Inventory uid={uid} />}
+            {activeTab === 'layplan'   && <LayPlanTool uid={uid} />}
+            {activeTab === 'projects'  && <ProjectGallery uid={uid} />}
+            {activeTab === 'partage'   && <CreationShare uid={uid} username={username} />}
           </div>
         </main>
       </div>

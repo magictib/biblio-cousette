@@ -2,8 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Fabric, Pattern } from '@/types';
-import { loadFabrics } from '@/utils/migrate';
-import { loadPatternsIDB } from '@/utils/idb';
+import { loadFabricsDB, loadPatternsDB } from '@/lib/db';
 import LayPlanCanvas, { PatternPiece, FabricConstraints, computeLayPlan } from './LayPlanCanvas';
 import type { PatternPieceRaw } from '@/utils/openai';
 
@@ -31,7 +30,9 @@ const STRETCH_OPTIONS = [
 
 const GARMENT_SUBTYPES = ['culotte', 'tanga', 'shorty', 'brassière', 'débardeur', 'crop top', 'combinaison', 'autre'];
 
-export default function LayPlanTool() {
+interface Props { uid: string }
+
+export default function LayPlanTool({ uid }: Props) {
   const [fabrics,    setFabrics]    = useState<Fabric[]>([]);
   const [patterns,   setPatterns]   = useState<Pattern[]>([]);
   const [fabricId,   setFabricId]   = useState('');
@@ -59,9 +60,9 @@ export default function LayPlanTool() {
   const imageRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    setFabrics(loadFabrics());
-    loadPatternsIDB().then(setPatterns).catch(() => null);
-  }, []);
+    loadFabricsDB(uid).then(setFabrics).catch(() => null);
+    loadPatternsDB(uid).then(setPatterns).catch(() => null);
+  }, [uid]);
 
   useEffect(() => {
     setConstraints(prev => ({
