@@ -257,7 +257,7 @@ export default function CreationShare() {
                   </div>
                 ))}
                 <button type="button" onClick={() => photoRef.current?.click()}
-                  style={{ width: '80px', height: '80px', borderRadius: '6px', border: '2px dashed var(--mauve-pale)', backgroundColor: 'white', color: 'var(--mauve)', cursor: 'pointer', fontSize: '1.4rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  style={{ width: '80px', height: '80px', borderRadius: '6px', border: '2px dashed var(--mauve-pale)', backgroundColor: 'var(--creme)', color: 'var(--mauve)', cursor: 'pointer', fontSize: '1.4rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   ＋
                 </button>
                 <input ref={photoRef} type="file" accept="image/*" multiple style={{ display: 'none' }} onChange={handlePhotos} />
@@ -296,7 +296,7 @@ export default function CreationShare() {
               <button type="submit" className="btn-couture">
                 {editing ? '✓ Enregistrer' : '＋ Publier la création'}
               </button>
-              <button type="button" onClick={cancelForm} style={{ padding: '8px 16px', borderRadius: '6px', border: '1.5px solid var(--mauve-pale)', backgroundColor: 'white', color: 'var(--brun-mid)', cursor: 'pointer', fontFamily: 'Georgia, serif', fontSize: '0.9rem' }}>
+              <button type="button" onClick={cancelForm} style={{ padding: '8px 16px', borderRadius: '6px', border: '1.5px solid var(--mauve-pale)', backgroundColor: 'var(--creme)', color: 'var(--brun-mid)', cursor: 'pointer', fontFamily: 'Georgia, serif', fontSize: '0.9rem' }}>
                 Annuler
               </button>
             </div>
@@ -316,7 +316,7 @@ export default function CreationShare() {
             const sc = STATUS_COLORS[c.status];
             return (
               <div key={c.id} style={{
-                backgroundColor: 'white', border: '1.5px solid var(--mauve-pale)',
+                backgroundColor: 'var(--creme)', border: '1.5px solid var(--mauve-pale)',
                 borderRadius: '10px', overflow: 'hidden',
                 boxShadow: '0 2px 10px rgba(94,53,120,.08)',
               }}>

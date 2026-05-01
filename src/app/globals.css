@@ -59,7 +59,7 @@ body {
 
 /* ─── Carte d'item individuel (tissu, patron, projet) ─────────── */
 .item-card {
-  background-color: white;
+  background-color: var(--creme);
   border: 1.5px solid var(--mauve-pale);
   border-radius: 8px;
   position: relative;
@@ -197,7 +197,7 @@ body {
   padding: 8px 12px;
   border: 1.5px solid var(--mauve-pale);
   border-radius: 6px;
-  background-color: white;
+  background-color: var(--creme);
   color: var(--brun);
   font-family: Georgia, serif;
   font-size: 0.9rem;

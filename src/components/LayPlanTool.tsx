@@ -161,7 +161,7 @@ export default function LayPlanTool() {
                   style={{
                     padding: '5px 10px', borderRadius: '5px', cursor: 'pointer', fontSize: '0.85rem', fontFamily: 'Georgia, serif',
                     border: `1.5px solid ${size === s ? 'var(--mauve)' : 'var(--mauve-pale)'}`,
-                    backgroundColor: size === s ? 'var(--mauve)' : 'white',
+                    backgroundColor: size === s ? 'var(--mauve)' : 'var(--creme)',
                     color: size === s ? 'var(--creme)' : 'var(--brun-mid)',
                   }}>
                   {s}

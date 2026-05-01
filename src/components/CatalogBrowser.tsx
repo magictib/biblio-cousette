@@ -214,7 +214,7 @@ export default function CatalogBrowser({ onSelect, onAddPattern, onClose }: Cata
                         display: 'flex', alignItems: 'flex-start', gap: '12px',
                         padding: '12px 14px', textAlign: 'left', cursor: 'pointer',
                         border: `1.5px solid ${isSelected ? 'var(--mauve)' : 'var(--mauve-pale)'}`,
-                        backgroundColor: isSelected ? 'var(--mauve-pale)' : 'white',
+                        backgroundColor: isSelected ? 'var(--mauve-pale)' : 'var(--creme)',
                         borderRadius: '8px', transition: 'all 0.15s',
                       }}>
                       <div style={{ flex: 1 }}>
@@ -269,7 +269,7 @@ export default function CatalogBrowser({ onSelect, onAddPattern, onClose }: Cata
                       style={{
                         padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.82rem',
                         border: `1.5px solid ${chosenSize === s ? 'var(--mauve)' : 'var(--mauve-pale)'}`,
-                        backgroundColor: chosenSize === s ? 'var(--mauve)' : 'white',
+                        backgroundColor: chosenSize === s ? 'var(--mauve)' : 'var(--creme)',
                         color: chosenSize === s ? 'var(--creme)' : 'var(--brun-mid)',
                         fontFamily: 'Georgia, serif',
                       }}>
@@ -298,7 +298,7 @@ export default function CatalogBrowser({ onSelect, onAddPattern, onClose }: Cata
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
                     width: '100%', padding: '9px 14px', marginBottom: '10px',
                     borderRadius: '7px', border: '1.5px solid var(--mauve-light)',
-                    backgroundColor: 'white', color: 'var(--mauve)',
+                    backgroundColor: 'var(--creme)', color: 'var(--mauve)',
                     fontFamily: 'Georgia, serif', fontSize: '0.85rem', fontWeight: 'bold',
                     textDecoration: 'none', boxSizing: 'border-box',
                   }}>

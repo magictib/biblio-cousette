@@ -130,7 +130,7 @@ export default function ProjectCard({ project, fabricName, patternName, onUpdate
                   border: '1.5px solid var(--mauve-light)',
                   borderRadius: '6px', fontFamily: 'Georgia, serif',
                   fontSize: '0.85rem', color: 'var(--brun)',
-                  backgroundColor: 'white',
+                  backgroundColor: 'var(--creme)',
                 }}
               >
                 {Object.entries(statusConfig).map(([key, s]) => (
