@@ -12,6 +12,13 @@ import { Fabric, Pattern, PatternFile, Project, Creation } from '@/types';
 // Les PDFs et photos ne quittent pas le navigateur — pas besoin de Storage.
 // ─────────────────────────────────────────────────────────────────
 
+// Firestore refuse les champs undefined — on les supprime avant setDoc.
+function clean<T extends object>(obj: T): T {
+  return Object.fromEntries(
+    Object.entries(obj).filter(([, v]) => v !== undefined)
+  ) as T;
+}
+
 // ── TISSUS ───────────────────────────────────────────────────────
 
 type FabricMeta = Omit<Fabric, 'photos'> & { photoCount: number };
@@ -34,7 +41,7 @@ export async function saveFabricDB(uid: string, fabric: Fabric): Promise<Fabric>
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { photos: _photos, ...rest } = fabric;
   const meta: FabricMeta = { ...rest, photoCount: fabric.photos.length };
-  await setDoc(doc(db, 'users', uid, 'fabrics', fabric.id), meta);
+  await setDoc(doc(db, 'users', uid, 'fabrics', fabric.id), clean(meta));
 
   return fabric;
 }
@@ -71,7 +78,7 @@ export async function savePatternDB(uid: string, pattern: Pattern): Promise<Patt
     ...rest,
     pdfFileNames: (pdfFiles ?? []).map(f => ({ name: f.name })),
   };
-  await setDoc(doc(db, 'users', uid, 'patterns', pattern.id), meta);
+  await setDoc(doc(db, 'users', uid, 'patterns', pattern.id), clean(meta));
 
   return pattern;
 }
@@ -99,7 +106,7 @@ export async function saveProjectDB(uid: string, project: Project): Promise<Proj
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { photos: _photos, ...rest } = project;
   const meta: ProjectMeta = { ...rest, photoCount: project.photos.length };
-  await setDoc(doc(db, 'users', uid, 'projects', project.id), meta);
+  await setDoc(doc(db, 'users', uid, 'projects', project.id), clean(meta));
   return project;
 }
 
@@ -134,7 +141,7 @@ export async function saveSharedCreationDB(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { photos: _photos, ...rest } = creation;
   const meta: SharedCreationMeta = { ...rest, photoCount: creation.photos.length, userId: uid, username };
-  await setDoc(doc(db, 'shared_creations', creation.id), meta);
+  await setDoc(doc(db, 'shared_creations', creation.id), clean(meta));
   return { ...creation, userId: uid, username };
 }
 
