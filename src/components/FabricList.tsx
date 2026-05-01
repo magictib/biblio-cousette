@@ -64,7 +64,7 @@ export default function FabricList({ fabrics, onDelete, onEdit }: FabricListProp
         <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'Georgia, serif', fontSize: '0.85rem' }}>
           <thead>
             <tr style={{ borderBottom: '2px solid var(--mauve-light)' }}>
-              {['Nom', 'Type', 'Couleur', 'Dimensions', 'Motif', 'Notes', '', '', ''].map((h, i) => (
+              {['', 'Type', 'Couleur', 'Dimensions', 'Motif', 'Notes', '', ''].map((h, i) => (
                 <th key={i} style={{
                   padding: '8px 12px', textAlign: 'left', fontSize: '0.68rem',
                   textTransform: 'uppercase', letterSpacing: '0.08em',
@@ -87,18 +87,28 @@ export default function FabricList({ fabrics, onDelete, onEdit }: FabricListProp
               return (
                 <tr key={f.id} style={{ backgroundColor: idx % 2 === 0 ? 'transparent' : 'rgba(94,53,120,.05)', borderBottom: '1px solid var(--mauve-pale)' }}>
 
-                  {/* Nom */}
-                  <td style={{ padding: '10px 12px', color: 'var(--brun)', fontWeight: 'bold', maxWidth: '180px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <span style={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {f.name}
-                      </span>
-                      {f.isScrap && (
-                        <span style={{ fontSize: '0.65rem', fontWeight: 'bold', padding: '1px 6px', borderRadius: '8px', backgroundColor: 'var(--mauve)', color: 'var(--creme)', whiteSpace: 'nowrap', flexShrink: 0 }}>
-                          ✂️ Chute
-                        </span>
-                      )}
-                    </div>
+                  {/* Photo / couleur */}
+                  <td style={{ padding: '8px 8px 8px 12px', width: '68px' }}>
+                    {f.photos.length > 0 ? (
+                      <button onClick={() => setPreview({ photos: f.photos, idx: 0 })} title="Voir la photo"
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'block', position: 'relative' }}>
+                        <img src={f.photos[0]} alt=""
+                          style={{ width: '56px', height: '56px', objectFit: 'cover', borderRadius: '7px', border: '1.5px solid var(--mauve-pale)', display: 'block' }} />
+                        {f.isScrap && (
+                          <span style={{ position: 'absolute', bottom: '2px', right: '2px', fontSize: '0.55rem', fontWeight: 'bold', padding: '1px 4px', borderRadius: '4px', backgroundColor: 'var(--mauve)', color: 'var(--creme)' }}>
+                            chute
+                          </span>
+                        )}
+                      </button>
+                    ) : (
+                      <div style={{ position: 'relative', width: '56px', height: '56px', borderRadius: '7px', backgroundColor: f.color, border: '1.5px solid var(--mauve-light)', flexShrink: 0 }}>
+                        {f.isScrap && (
+                          <span style={{ position: 'absolute', bottom: '2px', right: '2px', fontSize: '0.55rem', fontWeight: 'bold', padding: '1px 4px', borderRadius: '4px', backgroundColor: 'var(--mauve)', color: 'var(--creme)' }}>
+                            chute
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </td>
 
                   {/* Type */}
@@ -139,27 +149,6 @@ export default function FabricList({ fabrics, onDelete, onEdit }: FabricListProp
                         {f.notes}
                       </span>
                     ) : '—'}
-                  </td>
-
-                  {/* Icône photo */}
-                  <td style={{ padding: '10px 8px', textAlign: 'center', width: '36px' }}>
-                    {f.photos.length > 0 ? (
-                      <button
-                        onClick={() => setPreview({ photos: f.photos, idx: 0 })}
-                        title="Voir la photo"
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', borderRadius: '5px', lineHeight: 1 }}
-                        onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--mauve-pale)')}
-                        onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
-                      >
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--mauve)" strokeWidth="2" strokeLinecap="round">
-                          <rect x="3" y="3" width="18" height="18" rx="2"/>
-                          <circle cx="8.5" cy="8.5" r="1.5"/>
-                          <polyline points="21 15 16 10 5 21"/>
-                        </svg>
-                      </button>
-                    ) : (
-                      <span style={{ color: 'var(--mauve-pale)', fontSize: '0.7rem' }}>—</span>
-                    )}
                   </td>
 
                   {/* Icône modifier */}

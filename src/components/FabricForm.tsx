@@ -51,7 +51,6 @@ export default function FabricForm({ onSubmit, onCancel, initialValues }: Fabric
   const iv = initialValues;
   const isEdit = !!iv;
 
-  const [name,           setName]           = useState(iv?.name          ?? '');
   const [color,          setColor]          = useState(iv?.color         ?? '#C4889A');
   const [colorName,      setColorName]      = useState('');
   const [detectingColor, setDetectingColor] = useState(false);
@@ -141,7 +140,8 @@ export default function FabricForm({ onSubmit, onCancel, initialValues }: Fabric
     }
 
     onSubmit({
-      name, color, type: type || 'coton',
+      name: [type || 'tissu', colorName].filter(Boolean).join(' ') || iv?.name || 'Tissu',
+      color, type: type || 'coton',
       width: w, length: l,
       pattern:       pattern       || undefined,
       notes:         notes         || undefined,
@@ -155,16 +155,10 @@ export default function FabricForm({ onSubmit, onCancel, initialValues }: Fabric
   return (
     <form onSubmit={handleSubmit}>
       <h4 style={{ color: 'var(--mauve)', fontFamily: 'Georgia, serif', fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '20px' }}>
-        {isEdit ? `Modifier "${iv.name}"` : 'Ajouter un tissu'}
+        {isEdit ? 'Modifier le tissu' : 'Ajouter un tissu'}
       </h4>
 
       <div style={{ ...row2, marginBottom: '14px' }}>
-        <div>
-          <label className="field-label">Nom / Référence *</label>
-          <input className="field-input" required value={name}
-            onChange={e => setName(e.target.value)} placeholder="Ex : Lin bleu ardoise" />
-        </div>
-
         <div>
           <label className="field-label">Type</label>
           <input className="field-input" list="fabric-types-list" value={type}
