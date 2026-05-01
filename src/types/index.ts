@@ -12,16 +12,23 @@ export interface Fabric {
   estimatedArea?: number;  // surface estimée en cm² (pour les chutes)
 }
 
+export interface PatternFile {
+  name: string;
+  dataUrl: string;
+}
+
 export interface Pattern {
   id: string;
   name: string;
-  designer?: string;       // nom de la créatrice
+  designer?: string;
   clothingType: string;
-  width: number;           // en cm
-  height: number;          // en cm
+  width: number;
+  height: number;
   difficulty: 'facile' | 'moyen' | 'difficile';
   notes?: string;
-  pdfDataUrl?: string;     // PDF ou image importé(e), stocké(e) en base64
+  pdfDataUrl?: string;          // legacy — migré vers pdfFiles au chargement
+  pdfFiles?: PatternFile[];     // plusieurs fichiers (patron, livrets, etc.)
+  primaryPdfIndex?: number;     // index du fichier affiché par défaut
 }
 
 export interface Project {

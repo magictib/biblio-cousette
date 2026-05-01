@@ -7,6 +7,7 @@ interface PatternListProps {
   patterns: Pattern[];
   onDelete: (id: string) => void;
   onEdit:   (pattern: Pattern) => void;
+  onSetPrimaryPdf?: (id: string, index: number) => void;
 }
 
 const diffStyle: Record<string, { bg: string; color: string; border: string }> = {
@@ -15,8 +16,8 @@ const diffStyle: Record<string, { bg: string; color: string; border: string }> =
   difficile: { bg: '#FAE8E8', color: '#943030', border: '#D48080' },
 };
 
-export default function PatternList({ patterns, onDelete, onEdit }: PatternListProps) {
-  const [preview, setPreview] = useState<Pattern | null>(null);
+export default function PatternList({ patterns, onDelete, onEdit, onSetPrimaryPdf }: PatternListProps) {
+  const [preview, setPreview] = useState<{ pattern: Pattern; fileIdx: number } | null>(null);
 
   if (patterns.length === 0) {
     return (
@@ -27,33 +28,91 @@ export default function PatternList({ patterns, onDelete, onEdit }: PatternListP
     );
   }
 
+  const openPreview = (pattern: Pattern) => {
+    setPreview({ pattern, fileIdx: pattern.primaryPdfIndex ?? 0 });
+  };
+
+  const currentFile = preview?.pattern.pdfFiles?.[preview.fileIdx] ?? null;
+
   return (
     <>
       {/* ── Modal visualisateur ───────────────────────────────── */}
-      {preview?.pdfDataUrl && (
+      {preview && currentFile && (
         <div
           style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(61,36,24,.6)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}
           onClick={e => { if (e.target === e.currentTarget) setPreview(null); }}
         >
           <div style={{
             backgroundColor: 'var(--creme)', border: '2px solid var(--mauve-light)', borderRadius: '12px',
-            width: '100%', maxWidth: '900px', maxHeight: '90vh', display: 'flex', flexDirection: 'column',
+            width: '100%', maxWidth: '960px', maxHeight: '90vh', display: 'flex', flexDirection: 'column',
             boxShadow: '0 8px 40px rgba(61,36,24,.3)', overflow: 'hidden',
           }}>
+            {/* Header */}
             <div style={{ padding: '14px 20px', borderBottom: '1.5px solid var(--mauve-pale)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
               <span style={{ fontFamily: 'Georgia, serif', fontWeight: 'bold', color: 'var(--mauve)', fontSize: '1rem' }}>
-                📄 {preview.name}
+                📄 {preview.pattern.name} — {currentFile.name}
               </span>
               <button onClick={() => setPreview(null)}
                 style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: 'var(--brun-mid)' }}>✕</button>
             </div>
-            <div style={{ flex: 1, overflow: 'auto', padding: '16px', minHeight: 0 }}>
-              {preview.pdfDataUrl.startsWith('data:application/pdf') ? (
-                <iframe src={preview.pdfDataUrl} style={{ width: '100%', height: '70vh', border: 'none', borderRadius: '6px' }} title={preview.name} />
-              ) : (
-                <img src={preview.pdfDataUrl} alt={preview.name}
-                  style={{ maxWidth: '100%', maxHeight: '70vh', display: 'block', margin: '0 auto', borderRadius: '6px', border: '1.5px solid var(--mauve-pale)' }} />
+
+            {/* Body: sidebar + viewer */}
+            <div style={{ flex: 1, overflow: 'hidden', display: 'flex', minHeight: 0 }}>
+              {/* Sidebar (only if multiple files) */}
+              {(preview.pattern.pdfFiles?.length ?? 0) > 1 && (
+                <div style={{
+                  width: '190px', flexShrink: 0, borderRight: '1.5px solid var(--mauve-pale)',
+                  overflowY: 'auto', padding: '10px 8px', display: 'flex', flexDirection: 'column', gap: '4px',
+                  backgroundColor: 'var(--linen)',
+                }}>
+                  <div style={{ fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--brun-mid)', marginBottom: '6px', padding: '0 4px' }}>
+                    Fichiers
+                  </div>
+                  {preview.pattern.pdfFiles!.map((file, i) => {
+                    const isPrimary = (preview.pattern.primaryPdfIndex ?? 0) === i;
+                    const isActive = preview.fileIdx === i;
+                    return (
+                      <div key={i}
+                        onClick={() => setPreview({ ...preview, fileIdx: i })}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: '4px',
+                          padding: '6px 8px', borderRadius: '6px', cursor: 'pointer',
+                          backgroundColor: isActive ? 'var(--mauve-pale)' : 'transparent',
+                          border: isActive ? '1px solid var(--mauve-light)' : '1px solid transparent',
+                        }}
+                      >
+                        <button
+                          type="button"
+                          onClick={e => {
+                            e.stopPropagation();
+                            if (onSetPrimaryPdf) {
+                              onSetPrimaryPdf(preview.pattern.id, i);
+                              setPreview({ ...preview, pattern: { ...preview.pattern, primaryPdfIndex: i } });
+                            }
+                          }}
+                          title={isPrimary ? 'Fichier par défaut' : 'Définir comme fichier par défaut'}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0', lineHeight: 1, fontSize: '0.9rem', color: isPrimary ? '#A07828' : 'var(--mauve-pale)', flexShrink: 0 }}
+                        >
+                          {isPrimary ? '★' : '☆'}
+                        </button>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--brun)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+                          {file.name}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
               )}
+
+              {/* Viewer */}
+              <div style={{ flex: 1, overflow: 'auto', padding: '16px', minHeight: 0 }}>
+                {currentFile.dataUrl.startsWith('data:application/pdf') ? (
+                  <iframe src={currentFile.dataUrl} style={{ width: '100%', height: '70vh', border: 'none', borderRadius: '6px' }} title={currentFile.name} />
+                ) : (
+                  <img src={currentFile.dataUrl} alt={currentFile.name}
+                    style={{ maxWidth: '100%', maxHeight: '70vh', display: 'block', margin: '0 auto', borderRadius: '6px', border: '1.5px solid var(--mauve-pale)' }} />
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -79,6 +138,7 @@ export default function PatternList({ patterns, onDelete, onEdit }: PatternListP
           <tbody>
             {patterns.map((p, idx) => {
               const ds = diffStyle[p.difficulty] ?? diffStyle.moyen;
+              const fileCount = p.pdfFiles?.length ?? 0;
               return (
                 <tr key={p.id} style={{ backgroundColor: idx % 2 === 0 ? 'transparent' : 'rgba(200,180,190,.07)', borderBottom: '1px solid var(--mauve-pale)' }}>
 
@@ -118,11 +178,11 @@ export default function PatternList({ patterns, onDelete, onEdit }: PatternListP
 
                   {/* Icône voir patron */}
                   <td style={{ padding: '10px 8px', textAlign: 'center', width: '36px' }}>
-                    {p.pdfDataUrl ? (
+                    {fileCount > 0 ? (
                       <button
-                        onClick={() => setPreview(p)}
-                        title="Voir le patron"
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', borderRadius: '5px', lineHeight: 1 }}
+                        onClick={() => openPreview(p)}
+                        title={fileCount > 1 ? `Voir les ${fileCount} fichiers` : 'Voir le patron'}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', borderRadius: '5px', lineHeight: 1, position: 'relative' }}
                         onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--mauve-pale)')}
                         onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
                       >
@@ -132,6 +192,18 @@ export default function PatternList({ patterns, onDelete, onEdit }: PatternListP
                           <line x1="9" y1="13" x2="15" y2="13"/>
                           <line x1="9" y1="17" x2="13" y2="17"/>
                         </svg>
+                        {fileCount > 1 && (
+                          <span style={{
+                            position: 'absolute', top: '0', right: '0',
+                            fontSize: '0.55rem', fontWeight: 'bold',
+                            backgroundColor: 'var(--mauve)', color: 'var(--creme)',
+                            borderRadius: '50%', width: '13px', height: '13px',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            lineHeight: 1,
+                          }}>
+                            {fileCount}
+                          </span>
+                        )}
                       </button>
                     ) : (
                       <span style={{ color: 'var(--mauve-pale)', fontSize: '0.7rem' }}>—</span>

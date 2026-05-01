@@ -1,4 +1,4 @@
-import { Fabric, Pattern } from '@/types';
+import { Fabric, Pattern, PatternFile } from '@/types';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function migrateFabric(raw: any): Fabric {
@@ -24,16 +24,26 @@ export function migrateFabric(raw: any): Fabric {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function migratePattern(raw: any): Pattern {
+  let pdfFiles: PatternFile[] | undefined;
+  if (Array.isArray(raw.pdfFiles) && raw.pdfFiles.length > 0) {
+    pdfFiles = raw.pdfFiles.map((f: any) => ({
+      name: String(f.name ?? 'Fichier'),
+      dataUrl: String(f.dataUrl ?? ''),
+    }));
+  } else if (raw.pdfDataUrl) {
+    pdfFiles = [{ name: 'Patron', dataUrl: String(raw.pdfDataUrl) }];
+  }
   return {
-    id:          String(raw.id ?? ''),
-    name:        String(raw.name ?? ''),
-    designer:    raw.designer ? String(raw.designer) : undefined,
-    clothingType:String(raw.clothingType ?? 'autres'),
-    width:       Number(raw.width ?? 60),
-    height:      Number(raw.height ?? 80),
-    difficulty:  (['facile', 'moyen', 'difficile'].includes(raw.difficulty) ? raw.difficulty : 'moyen') as Pattern['difficulty'],
-    notes:       raw.notes      ? String(raw.notes)      : undefined,
-    pdfDataUrl:  raw.pdfDataUrl ? String(raw.pdfDataUrl) : undefined,
+    id:              String(raw.id ?? ''),
+    name:            String(raw.name ?? ''),
+    designer:        raw.designer ? String(raw.designer) : undefined,
+    clothingType:    String(raw.clothingType ?? 'autres'),
+    width:           Number(raw.width ?? 60),
+    height:          Number(raw.height ?? 80),
+    difficulty:      (['facile', 'moyen', 'difficile'].includes(raw.difficulty) ? raw.difficulty : 'moyen') as Pattern['difficulty'],
+    notes:           raw.notes ? String(raw.notes) : undefined,
+    pdfFiles,
+    primaryPdfIndex: raw.primaryPdfIndex !== undefined ? Number(raw.primaryPdfIndex) : 0,
   };
 }
 

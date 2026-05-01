@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Pattern } from '@/types';
+import { Pattern, PatternFile } from '@/types';
 import CatalogBrowser from './CatalogBrowser';
 
 interface PatternFormProps {
@@ -16,15 +16,17 @@ export default function PatternForm({ onSubmit, onCancel, initialValues }: Patte
   const iv = initialValues;
   const isEdit = !!iv;
 
-  const [name,         setName]         = useState(iv?.name         ?? '');
-  const [designer,     setDesigner]     = useState(iv?.designer     ?? '');
-  const [clothingType, setClothingType] = useState(iv?.clothingType ?? 'robe');
-  const [difficulty,   setDifficulty]   = useState<Pattern['difficulty']>(iv?.difficulty ?? 'moyen');
-  const [width,        setWidth]        = useState(iv?.width  ? String(Math.round(iv.width))  : '60');
-  const [height,       setHeight]       = useState(iv?.height ? String(Math.round(iv.height)) : '80');
-  const [notes,        setNotes]        = useState(iv?.notes        ?? '');
-  const [unit,         setUnit]         = useState<'cm' | 'inch'>('cm');
-  const [showCatalog,  setShowCatalog]  = useState(false);
+  const [name,            setName]            = useState(iv?.name         ?? '');
+  const [designer,        setDesigner]        = useState(iv?.designer     ?? '');
+  const [clothingType,    setClothingType]    = useState(iv?.clothingType ?? 'robe');
+  const [difficulty,      setDifficulty]      = useState<Pattern['difficulty']>(iv?.difficulty ?? 'moyen');
+  const [width,           setWidth]           = useState(iv?.width  ? String(Math.round(iv.width))  : '60');
+  const [height,          setHeight]          = useState(iv?.height ? String(Math.round(iv.height)) : '80');
+  const [notes,           setNotes]           = useState(iv?.notes        ?? '');
+  const [unit,            setUnit]            = useState<'cm' | 'inch'>('cm');
+  const [showCatalog,     setShowCatalog]     = useState(false);
+  const [pdfFiles,        setPdfFiles]        = useState<PatternFile[]>(iv?.pdfFiles ?? []);
+  const [primaryPdfIndex, setPrimaryPdfIndex] = useState(iv?.primaryPdfIndex ?? 0);
 
   const handleCatalogSelect = (pattern: Omit<Pattern, 'id'>) => {
     setName(pattern.name);
@@ -38,18 +40,46 @@ export default function PatternForm({ onSubmit, onCancel, initialValues }: Patte
     setShowCatalog(false);
   };
 
+  const handlePdfUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = ev => {
+        const dataUrl = ev.target?.result as string;
+        const baseName = file.name.replace(/\.[^.]+$/, '');
+        setPdfFiles(prev => [...prev, { name: baseName, dataUrl }]);
+      };
+      reader.readAsDataURL(file);
+    });
+    e.target.value = '';
+  };
+
+  const removePdfFile = (i: number) => {
+    setPdfFiles(prev => prev.filter((_, j) => j !== i));
+    setPrimaryPdfIndex(prev => {
+      if (i < prev) return prev - 1;
+      if (i === prev) return 0;
+      return prev;
+    });
+  };
+
+  const renamePdfFile = (i: number, newName: string) => {
+    setPdfFiles(prev => prev.map((f, j) => j === i ? { ...f, name: newName } : f));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const factor = unit === 'inch' ? 2.54 : 1;
     onSubmit({
       name,
-      designer:     designer || undefined,
+      designer:        designer || undefined,
       clothingType,
       difficulty,
-      width:        (parseFloat(width)  || 60) * factor,
-      height:       (parseFloat(height) || 80) * factor,
-      notes:        notes || undefined,
-      pdfDataUrl:   iv?.pdfDataUrl,
+      width:           (parseFloat(width)  || 60) * factor,
+      height:          (parseFloat(height) || 80) * factor,
+      notes:           notes || undefined,
+      pdfFiles:        pdfFiles.length > 0 ? pdfFiles : undefined,
+      primaryPdfIndex: pdfFiles.length > 0 ? Math.min(primaryPdfIndex, pdfFiles.length - 1) : 0,
     });
   };
 
@@ -140,6 +170,54 @@ export default function PatternForm({ onSubmit, onCancel, initialValues }: Patte
           <label className="field-label">Notes</label>
           <textarea className="field-input" value={notes} onChange={e => setNotes(e.target.value)}
             rows={3} style={{ resize: 'vertical' }} placeholder="Tailles disponibles, remarques, description…" />
+        </div>
+
+        {/* ── Fichiers PDF ───────────────────────────────────── */}
+        <div style={{ marginBottom: '20px' }}>
+          <label className="field-label">Fichiers PDF</label>
+
+          {pdfFiles.length > 0 && (
+            <div style={{ marginBottom: '10px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+              {pdfFiles.map((file, i) => {
+                const isPrimary = primaryPdfIndex === i;
+                return (
+                  <div key={i} style={{
+                    display: 'flex', alignItems: 'center', gap: '8px',
+                    padding: '6px 10px', borderRadius: '6px',
+                    border: `1.5px solid ${isPrimary ? '#A07828' : 'var(--mauve-pale)'}`,
+                    backgroundColor: isPrimary ? 'rgba(160,120,40,.07)' : 'transparent',
+                  }}>
+                    <button type="button" onClick={() => setPrimaryPdfIndex(i)}
+                      title={isPrimary ? 'Fichier par défaut' : 'Définir comme fichier par défaut'}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', color: isPrimary ? '#A07828' : 'var(--mauve-pale)', padding: '0', lineHeight: 1, flexShrink: 0 }}>
+                      {isPrimary ? '★' : '☆'}
+                    </button>
+                    <input
+                      value={file.name}
+                      onChange={e => renamePdfFile(i, e.target.value)}
+                      style={{ flex: 1, border: 'none', background: 'transparent', fontFamily: 'Georgia, serif', fontSize: '0.85rem', color: 'var(--brun)', outline: 'none', minWidth: 0 }}
+                      placeholder="Nom du fichier"
+                    />
+                    <span style={{ fontSize: '0.68rem', color: 'var(--brun-mid)', fontStyle: 'italic', flexShrink: 0 }}>
+                      {file.dataUrl.startsWith('data:application/pdf') ? 'PDF' : 'Image'}
+                    </span>
+                    <button type="button" onClick={() => removePdfFile(i)}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#943030', fontSize: '0.9rem', padding: '0 2px', flexShrink: 0, lineHeight: 1 }}>
+                      ✕
+                    </button>
+                  </div>
+                );
+              })}
+              <p style={{ margin: '4px 0 0', fontSize: '0.7rem', color: 'var(--brun-mid)', fontStyle: 'italic' }}>
+                Cliquez sur ☆ pour choisir le fichier affiché par défaut dans la collection.
+              </p>
+            </div>
+          )}
+
+          <label style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', padding: '7px 14px', borderRadius: '6px', border: '1.5px solid var(--mauve-light)', backgroundColor: 'var(--mauve-pale)', color: 'var(--mauve)', fontFamily: 'Georgia, serif', fontSize: '0.82rem', cursor: 'pointer', fontWeight: 'bold' }}>
+            📄 {pdfFiles.length === 0 ? 'Ajouter un fichier PDF' : 'Ajouter un autre fichier'}
+            <input type="file" accept=".pdf,image/*" multiple onChange={handlePdfUpload} style={{ display: 'none' }} />
+          </label>
         </div>
 
         <div style={{ display: 'flex', gap: '10px' }}>

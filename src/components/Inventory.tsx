@@ -52,7 +52,7 @@ export default function Inventory() {
     if (editingPattern) {
       setPatterns(prev => prev.map(p =>
         p.id === editingPattern.id
-          ? { ...data, id: editingPattern.id, pdfDataUrl: data.pdfDataUrl ?? p.pdfDataUrl }
+          ? { ...data, id: editingPattern.id, pdfFiles: data.pdfFiles ?? p.pdfFiles, primaryPdfIndex: data.primaryPdfIndex ?? p.primaryPdfIndex ?? 0 }
           : p
       ));
       setEditingPattern(null);
@@ -60,6 +60,10 @@ export default function Inventory() {
       setPatterns(prev => [...prev, { ...data, id: Date.now().toString() }]);
     }
     setShowForm(false);
+  };
+
+  const handleSetPrimaryPdf = (id: string, index: number) => {
+    setPatterns(prev => prev.map(p => p.id === id ? { ...p, primaryPdfIndex: index } : p));
   };
 
   const startEditPattern = (pattern: Pattern) => {
@@ -153,7 +157,7 @@ export default function Inventory() {
       {/* ── Listes ────────────────────────────────────────────────── */}
       {activeTab === 'fabrics'
         ? <FabricList  fabrics={fabrics}   onDelete={deleteFabric}  onEdit={startEditFabric}  />
-        : <PatternList patterns={patterns} onDelete={deletePattern} onEdit={startEditPattern} />
+        : <PatternList patterns={patterns} onDelete={deletePattern} onEdit={startEditPattern} onSetPrimaryPdf={handleSetPrimaryPdf} />
       }
     </div>
   );
